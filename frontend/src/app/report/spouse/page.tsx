@@ -1,27 +1,180 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import StarField from '@/components/particles/StarField';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import { FiArrowLeft, FiShare2, FiDownload, FiHeart } from 'react-icons/fi';
+import {
+  FiArrowLeft,
+  FiShare2,
+  FiDownload,
+  FiRefreshCw,
+  FiAlertTriangle,
+  FiCopy,
+} from 'react-icons/fi';
+
+type PortraitBreakdown = {
+  physique: string[];
+  features: string[];
+  aura: string[];
+  maturity: string[];
+};
+
+interface PortraitData {
+  prompt: string;
+  breakdown: PortraitBreakdown;
+  astrologySummary: Record<string, string | string[]>;
+  imageUrl: string | null;
+  warnings: string[];
+}
+
+const SUMMARY_LABELS: Record<string, string> = {
+  seventhHouseSign: '第七宫星座',
+  seventhLord: '第七宫主星',
+  seventhLordSign: '主星落座',
+  seventhLordNakshatra: '主星月宿',
+  planetsInSeventhHouse: '第七宫行星',
+  daraKarakaPlanet: 'Dara Karaka',
+  d9LagnaSign: 'D9 上升星座',
+};
 
 export default function SpouseReportPage() {
   const router = useRouter();
   const [birthInfo, setBirthInfo] = useState<any>(null);
   const [isTyping, setIsTyping] = useState(true);
+  const [portraitData, setPortraitData] = useState<PortraitData | null>(null);
+  const [isGeneratingPortrait, setIsGeneratingPortrait] = useState(false);
+  const [portraitError, setPortraitError] = useState<string | null>(null);
+  const [lastGeneratedAt, setLastGeneratedAt] = useState<string | null>(null);
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle');
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem('birthInfo');
     if (stored) {
       setBirthInfo(JSON.parse(stored));
     }
-    
-    // 模拟打字机效果完成
-    setTimeout(() => setIsTyping(false), 3000);
+
+    const typingTimeout = setTimeout(() => setIsTyping(false), 3000);
+
+    return () => {
+      clearTimeout(typingTimeout);
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+      }
+    };
   }, []);
+
+  const generatePortrait = useCallback(
+    async (signal?: AbortSignal) => {
+      if (!birthInfo || signal?.aborted) return;
+
+      setIsGeneratingPortrait(true);
+      setPortraitError(null);
+
+      try {
+        const response = await fetch('/api/spouse-portrait', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(birthInfo),
+          signal,
+        });
+
+        const payload = await response.json().catch(() => null);
+
+        if (!response.ok) {
+          const message =
+            payload?.error || payload?.details || `请求失败 (${response.status})`;
+          throw new Error(message);
+        }
+
+        if (!payload || !payload.prompt) {
+          throw new Error('未能解析画像数据，请稍后重试。');
+        }
+
+        const normalizedBreakdown: PortraitBreakdown = {
+          physique: payload.breakdown?.physique ?? [],
+          features: payload.breakdown?.features ?? [],
+          aura: payload.breakdown?.aura ?? [],
+          maturity: payload.breakdown?.maturity ?? [],
+        };
+
+        const normalized: PortraitData = {
+          prompt: payload.prompt as string,
+          breakdown: normalizedBreakdown,
+          astrologySummary: payload.astrologySummary ?? {},
+          imageUrl: payload.imageUrl ?? null,
+          warnings: Array.isArray(payload.warnings) ? payload.warnings : [],
+        };
+
+        setPortraitData(normalized);
+        setLastGeneratedAt(new Date().toISOString());
+        setCopyStatus('idle');
+      } catch (error) {
+        if ((error as Error).name === 'AbortError') {
+          return;
+        }
+        setPortraitError((error as Error).message || '生成失败，请稍后重试。');
+      } finally {
+        setIsGeneratingPortrait(false);
+      }
+    },
+    [birthInfo],
+  );
+
+  useEffect(() => {
+    if (!birthInfo) return;
+    const controller = new AbortController();
+    generatePortrait(controller.signal);
+    return () => controller.abort();
+  }, [birthInfo, generatePortrait]);
+
+  const handleRegenerate = useCallback(() => {
+    generatePortrait();
+  }, [generatePortrait]);
+
+  const handleCopyPrompt = useCallback(() => {
+    if (!portraitData?.prompt) return;
+
+    try {
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+      }
+
+      if (!navigator?.clipboard) {
+        throw new Error('浏览器暂不支持快速复制，请手动复制。');
+      }
+
+      navigator.clipboard
+        .writeText(portraitData.prompt)
+        .then(() => {
+          setCopyStatus('copied');
+          copyTimeoutRef.current = setTimeout(() => {
+            setCopyStatus('idle');
+          }, 2000);
+        })
+        .catch(() => {
+          setCopyStatus('error');
+          copyTimeoutRef.current = setTimeout(() => {
+            setCopyStatus('idle');
+          }, 2000);
+        });
+    } catch (err) {
+      setCopyStatus('error');
+      copyTimeoutRef.current = setTimeout(() => {
+        setCopyStatus('idle');
+      }, 2000);
+    }
+  }, [portraitData?.prompt]);
+
+  const formattedGeneratedAt = lastGeneratedAt
+    ? new Date(lastGeneratedAt).toLocaleString()
+    : null;
 
   const shareQuote = (quote: string) => {
     // 这里可以实现分享功能
@@ -97,6 +250,206 @@ export default function SpouseReportPage() {
             )}
           </motion.div>
 
+          {/* AI Portrait Generator */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="mb-16"
+          >
+            <Card glow="gold" className="p-8">
+              <div className="grid gap-8 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] items-start">
+                <div className="w-full">
+                  <div className="relative aspect-[2/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 flex items-center justify-center">
+                    {isGeneratingPortrait ? (
+                      <div className="px-6 text-center text-text-muted animate-pulse">
+                        正在调用星象与AI灵感，稍等片刻...
+                      </div>
+                    ) : portraitError ? (
+                      <div className="px-6 text-center text-rose-100 text-sm">
+                        {portraitError}
+                      </div>
+                    ) : portraitData?.imageUrl ? (
+                      <Image
+                        src={portraitData.imageUrl}
+                        alt="你的灵魂伴侣画像"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 45vw"
+                        className="object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="px-6 text-center text-text-muted text-sm leading-relaxed">
+                        画像生成成功，但当前模型未返回图片链接。你仍然可以使用下方的AI绘画提示词，在喜爱的图像平台中生成配偶画像。
+                      </div>
+                    )}
+                  </div>
+                  {formattedGeneratedAt && (
+                    <p className="mt-4 text-center text-xs text-text-muted">
+                      最近生成时间：{formattedGeneratedAt}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <h3 className="text-3xl font-display gradient-text flex items-center gap-2">
+                      <span>AI 灵魂伴侣画像</span>
+                      <span className="text-2xl">💞</span>
+                    </h3>
+                    <p className="text-sm text-text-muted">
+                      基于 {birthInfo?.date} {birthInfo?.time} 于 {birthInfo?.city} 的出生信息，结合吠陀占星第七宫与Navamsa盘关键指标生成。
+                    </p>
+                  </div>
+
+                  {portraitData?.warnings?.length ? (
+                    <div className="space-y-2 rounded-xl border border-white/10 bg-white/5 p-4 text-xs">
+                      {portraitData.warnings.map((warning, index) => {
+                        const isPositive = /成功|success/i.test(warning);
+                        return (
+                          <p
+                            key={`${warning}-${index}`}
+                            className={`flex items-start gap-2 leading-relaxed ${
+                              isPositive ? 'text-emerald-200' : 'text-amber-200'
+                            }`}
+                          >
+                            <FiAlertTriangle
+                              className={`mt-0.5 ${isPositive ? 'text-emerald-200' : 'text-amber-200'}`}
+                            />
+                            <span>{warning}</span>
+                          </p>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+
+                  <div className="space-y-4">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Button
+                        onClick={handleRegenerate}
+                        icon={<FiRefreshCw />}
+                        disabled={isGeneratingPortrait || !birthInfo}
+                      >
+                        {isGeneratingPortrait ? '重新生成中...' : '重新召唤画像'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        icon={<FiCopy />}
+                        onClick={handleCopyPrompt}
+                        disabled={!portraitData?.prompt || isGeneratingPortrait}
+                      >
+                        复制提示词
+                      </Button>
+                      {copyStatus === 'copied' && (
+                        <span className="text-xs text-emerald-200">已复制到剪贴板！</span>
+                      )}
+                      {copyStatus === 'error' && (
+                        <span className="text-xs text-rose-200">复制失败，请手动复制。</span>
+                      )}
+                    </div>
+
+                    {portraitData?.prompt ? (
+                      <div className="space-y-3">
+                        <p className="text-sm font-semibold tracking-widest text-text-secondary uppercase">
+                          AI 绘画提示词
+                        </p>
+                        <div className="max-h-52 overflow-y-auto rounded-2xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-text-secondary">
+                          {portraitData.prompt}
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-text-muted">
+                        正在为你准备提示词...
+                      </p>
+                    )}
+                  </div>
+
+                  {portraitData?.breakdown ? (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {portraitData.breakdown.physique.length > 0 && (
+                        <div className="space-y-2 rounded-xl border border-white/10 bg-white/5 p-4">
+                          <h4 className="text-sm font-semibold text-text-secondary">体态线索</h4>
+                          <ul className="space-y-2 text-sm text-text-muted">
+                            {portraitData.breakdown.physique.map((item, index) => (
+                              <li key={`physique-${index}`} className="leading-relaxed">
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {portraitData.breakdown.features.length > 0 && (
+                        <div className="space-y-2 rounded-xl border border-white/10 bg-white/5 p-4">
+                          <h4 className="text-sm font-semibold text-text-secondary">五官刻画</h4>
+                          <ul className="space-y-2 text-sm text-text-muted">
+                            {portraitData.breakdown.features.map((item, index) => (
+                              <li key={`feature-${index}`} className="leading-relaxed">
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {portraitData.breakdown.aura.length > 0 && (
+                        <div className="space-y-2 rounded-xl border border-white/10 bg-white/5 p-4">
+                          <h4 className="text-sm font-semibold text-text-secondary">灵魂气质</h4>
+                          <ul className="space-y-2 text-sm text-text-muted">
+                            {portraitData.breakdown.aura.map((item, index) => (
+                              <li key={`aura-${index}`} className="leading-relaxed">
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {portraitData.breakdown.maturity.length > 0 && (
+                        <div className="space-y-2 rounded-xl border border-white/10 bg-white/5 p-4">
+                          <h4 className="text-sm font-semibold text-text-secondary">成熟后魅力</h4>
+                          <ul className="space-y-2 text-sm text-text-muted">
+                            {portraitData.breakdown.maturity.map((item, index) => (
+                              <li key={`maturity-${index}`} className="leading-relaxed">
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ) : null}
+
+                  {portraitData?.astrologySummary ? (
+                    <div className="space-y-2">
+                      <p className="text-sm font-semibold text-text-secondary">占星关键点</p>
+                      <div className="flex flex-wrap gap-2">
+                        {Object.entries(portraitData.astrologySummary).map(([key, value]) => {
+                          if (!value || (Array.isArray(value) && value.length === 0)) {
+                            return null;
+                          }
+                          const label = SUMMARY_LABELS[key] ?? key;
+                          const displayValue = Array.isArray(value)
+                            ? value.join(', ')
+                            : value;
+                          return (
+                            <span
+                              key={key}
+                              className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs text-text-muted"
+                            >
+                              {label}: {displayValue}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+
           <div className="flex items-center justify-center gap-4 mb-16">
             <span className="text-4xl">✨</span>
             <span className="text-4xl">✨</span>
@@ -167,7 +520,7 @@ export default function SpouseReportPage() {
               <div className="quote-highlight">
                 <p className="text-text-secondary leading-relaxed">
                   然而，TA的灵魂也有其脆弱之处。双子座的能量有时会让TA显得难以捉摸，
-                  甚至有些"心不在焉"。这并非冷漠，而是TA的心智总是同时处理着太多的想法... 💭
+                  甚至有些“心不在焉”。这并非冷漠，而是TA的心智总是同时处理着太多的想法... 💭
                 </p>
                 <button
                   onClick={() => shareQuote('TA的灵魂也有其脆弱之处...')}

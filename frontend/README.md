@@ -20,6 +20,8 @@
 
 ## 开发
 
+> 从仓库根目录开始时，请先进入 `frontend` 目录：`cd path/to/AI-zhanbu/frontend`
+
 ```bash
 # 安装依赖
 npm install

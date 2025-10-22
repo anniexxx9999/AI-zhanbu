@@ -2,10 +2,17 @@
 
 ## 快速开始
 
+### 0. 切换到前端目录
+
+> 提示：如果你刚从 Git 克隆仓库，请先进入 `AI-zhanbu` 项目根目录，再切换到前端工程。
+
+```bash
+cd path/to/AI-zhanbu/frontend
+```
+
 ### 1. 安装依赖
 
 ```bash
-cd frontend
 npm install
 ```
 
