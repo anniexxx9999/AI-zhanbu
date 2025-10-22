@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Dancing+Script:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    @apply bg-twilight-gradient bg-fixed min-h-screen font-body text-text-primary;
+    background-size: 400% 400%;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  /* 玻璃拟态卡片 */
+  .glass-card {
+    @apply bg-card-glass backdrop-blur-md rounded-2xl border border-white/10;
+  }
+  
+  /* 渐变文字 */
+  .gradient-text {
+    @apply bg-accent-gradient bg-clip-text text-transparent;
+    background-size: 200% 200%;
+  }
+  
+  /* CTA按钮基础样式 */
+  .cta-button {
+    @apply bg-cta-gradient text-white font-medium px-8 py-4 rounded-full;
+    @apply transform transition-all duration-300 ease-out;
+    @apply hover:scale-105 hover:shadow-glow-purple;
+    background-size: 200% 200%;
+    animation: gradient-flow 3s ease infinite;
+  }
+  
+  /* 输入框基础样式 */
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl bg-white/5 border-2 border-white/10;
+    @apply text-text-primary placeholder-text-muted;
+    @apply focus:border-rose-gold focus:outline-none focus:shadow-glow-gold;
+    @apply transition-all duration-300;
+  }
+  
+  /* 星星粒子容器 */
+  .particles-container {
+    @apply fixed inset-0 pointer-events-none z-0;
+  }
+  
+  /* 浮动动画元素 */
+  .float-element {
+    @apply animate-float;
+  }
+  
+  /* 淡入向上动画 */
+  .fade-in-up {
+    @apply animate-fade-in-up;
+  }
+  
+  /* 缩放进入动画 */
+  .scale-in {
+    @apply animate-scale-in;
+  }
+}
+
+@layer utilities {
+  /* 自定义滚动条 */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-twilight-deep/50 rounded-full;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gradient-to-b from-rose-gold to-lavender-light rounded-full;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply from-lavender-light to-coral-pink;
+  }
+  
+  /* 文字渐变动画 */
+  .text-gradient-animate {
+    background-size: 200% 200%;
+    animation: gradient-flow 3s ease infinite;
+  }
+  
+  /* 脉冲发光 */
+  .pulse-glow {
+    @apply animate-pulse-glow;
+  }
+}
+
+/* 全局动画关键帧 */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 骨架屏加载动画 */
+.skeleton {
+  @apply bg-gradient-to-r from-white/5 via-white/10 to-white/5;
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* 闪烁星星效果 */
+.sparkle {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+/* 手写字体效果 */
+.handwritten {
+  @apply font-script italic;
+}
+
+/* 柔和阴影 */
+.soft-shadow {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(186, 148, 255, 0.1);
+}
+
+/* 强调引用 */
+.quote-highlight {
+  @apply border-l-4 border-rose-pink pl-6 py-2 italic text-text-secondary;
+}
+
