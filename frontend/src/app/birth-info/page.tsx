@@ -100,7 +100,7 @@ export default function BirthInfoPage() {
                         正在使用示例数据
                       </p>
                       <p className="text-xs text-purple-200">
-                        点击"输入我的信息"来替换为您的真实出生信息
+                        点击&ldquo;输入我的信息&rdquo;来替换为您的真实出生信息
                       </p>
                     </div>
                   </div>
