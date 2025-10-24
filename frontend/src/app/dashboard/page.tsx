@@ -10,6 +10,8 @@ import {
   FiCompass, FiGift, FiSun, FiMoon
 } from 'react-icons/fi';
 import StarField from '@/components/particles/StarField';
+import Navigation from '@/components/layout/Navigation';
+import Button from '@/components/ui/Button';
 
 // Mock data
 const fallbackBirthInfo = {
@@ -383,111 +385,8 @@ export default function DashboardPage() {
       <StarField />
       
       <div className="relative z-10 min-h-screen bg-transparent text-text-primary">
-        {/* Header - Optimized Dual Navigation */}
-        <header className="sticky top-0 z-30 backdrop-blur-md bg-[rgba(26,20,48,0.95)] border-b border-white/10 shadow-lg">
-          <div className="max-w-[1200px] mx-auto px-6 py-4">
-            <div className="flex items-center justify-between">
-              {/* Left: Logo */}
-              <button 
-                onClick={() => router.push('/')}
-                className="flex items-center gap-2 hover:opacity-80 transition group"
-              >
-                <motion.span 
-                  className="text-2xl"
-                  whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  🌟
-                </motion.span>
-                <div>
-                  <div className="text-lg font-serif text-white group-hover:text-pink-300 transition">AstroSoul</div>
-                  <div className="text-[10px] text-purple-300 tracking-wider uppercase">Find Your Path</div>
-                </div>
-              </button>
-
-              {/* Center: Main Dual Navigation */}
-              <div className="hidden md:flex items-center gap-8">
-                <button 
-                  onClick={() => router.push('/dashboard')}
-                  className="relative pb-1 group"
-                >
-                  <div className={`flex items-center gap-2 transition-all ${
-                    pathname === '/dashboard' 
-                      ? 'text-white font-semibold' 
-                      : 'text-purple-300 hover:text-white'
-                  }`}>
-                    <span className="text-sm">🌙</span>
-                    <span className="text-sm">My Soul</span>
-                  </div>
-                  {pathname === '/dashboard' && (
-                    <motion.div 
-                      layoutId="activeTab"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                    />
-                  )}
-                  {pathname !== '/dashboard' && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-300/0 group-hover:bg-purple-300/50 transition-colors" />
-                  )}
-                </button>
-                
-                <button 
-                  onClick={() => router.push('/report/spouse')}
-                  className="relative pb-1 group"
-                >
-                  <div className={`flex items-center gap-2 transition-all ${
-                    pathname === '/report/spouse' 
-                      ? 'text-white font-semibold' 
-                      : 'text-purple-300 hover:text-white'
-                  }`}>
-                    <motion.span 
-                      className="text-sm"
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      💕
-                    </motion.span>
-                    <span className="text-sm">My Soulmate</span>
-                  </div>
-                  {pathname === '/report/spouse' && (
-                    <motion.div 
-                      layoutId="activeTab"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                    />
-                  )}
-                  {pathname !== '/report/spouse' && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-300/0 group-hover:bg-purple-300/50 transition-colors" />
-                  )}
-                </button>
-              </div>
-              
-              {/* Right: Secondary Actions */}
-              <div className="flex items-center gap-3">
-              <button 
-                  onClick={() => router.push('/birth-info')}
-                  className="text-xs text-purple-300 hover:text-white transition hidden lg:block"
-                >
-                  Birth Info
-                </button>
-                <button className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white text-sm hover:shadow-lg transition">
-                  X
-                </button>
-              </div>
-
-              {/* Mobile: Hamburger Menu */}
-              <button className="md:hidden text-purple-300 hover:text-white">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-          </div>
-        </div>
-      </header>
+        {/* Navigation */}
+        <Navigation />
 
         <main className="max-w-[1200px] mx-auto px-6 py-10">
           {/* Module 1: Welcome Dashboard - 欢迎来到你的宇宙中心 */}
@@ -861,7 +760,7 @@ export default function DashboardPage() {
                 if (!arena) return null;
                 
                 // 检查是否有完整专业数据
-                const hasFullData = arena.professionalAnalysis;
+                const hasFullData = arena && 'professionalAnalysis' in arena && arena.professionalAnalysis;
                 
                 return (
                   <motion.div
@@ -1129,9 +1028,18 @@ export default function DashboardPage() {
                             '此宫位的详细专业分析正在完善中'
                           )}
                         </p>
-                        <p className="text-sm text-[#C7B8EA]">
-                          如需完整的12宫位深度解读，请升级至专业版报告
-                        </p>
+                        <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg p-4 border border-purple-400/30">
+                          <p className="text-sm text-purple-200 mb-3">
+                            如需完整的12宫位深度解读，请升级至专业版报告
+                          </p>
+                          <Button
+                            onClick={() => router.push('/pricing')}
+                            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition-all text-sm px-4 py-2"
+                          >
+                            <FiStar className="mr-1" />
+                            立即升级
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </motion.div>
