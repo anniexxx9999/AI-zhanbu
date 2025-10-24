@@ -167,7 +167,7 @@ export default function SpouseReportPage() {
               <div className="quote-highlight">
                 <p className="text-text-secondary leading-relaxed">
                   然而，TA的灵魂也有其脆弱之处。双子座的能量有时会让TA显得难以捉摸，
-                  甚至有些"心不在焉"。这并非冷漠，而是TA的心智总是同时处理着太多的想法... 💭
+                  甚至有些 &quot;心不在焉&quot;。这并非冷漠，而是TA的心智总是同时处理着太多的想法... 💭
                 </p>
                 <button
                   onClick={() => shareQuote('TA的灵魂也有其脆弱之处...')}
@@ -312,6 +312,5 @@ export default function SpouseReportPage() {
     </div>
   );
 }
-
 
 

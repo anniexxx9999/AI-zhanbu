@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { astrologyAPI, BirthInfo, ChartData } from '@/services/api';
 import { 
   FiHeart, FiChevronDown, FiChevronLeft, FiChevronRight, FiStar, 
   FiTrendingUp, FiClock, FiZap, FiTarget, FiLock, FiBookOpen,
@@ -11,7 +12,7 @@ import {
 import StarField from '@/components/particles/StarField';
 
 // Mock data
-const birthInfo = {
+const fallbackBirthInfo = {
   name: 'Xuan',
   date: '1995-05-15',
   time: '14:30',
@@ -229,12 +230,114 @@ const cosmicToolkit = {
 export default function DashboardPage() {
   const router = useRouter();
   const pathname = usePathname();
+  const [birthInfoState, setBirthInfoState] = useState<BirthInfo | null>(null);
+  const [chartData, setChartData] = useState<ChartData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedArena, setSelectedArena] = useState<number | null>(null);
   const [expandedSection, setExpandedSection] = useState<string>('trinity');
 
+  useEffect(() => {
+    const loadChartData = async () => {
+      try {
+        const storedBirthInfo = window.localStorage.getItem('birthInfo');
+        const parsedBirthInfo: BirthInfo = storedBirthInfo
+          ? JSON.parse(storedBirthInfo)
+          : fallbackBirthInfo;
+
+        if (!storedBirthInfo) {
+          window.localStorage.setItem('birthInfo', JSON.stringify(parsedBirthInfo));
+        }
+
+        setBirthInfoState(parsedBirthInfo);
+
+        const cachedChartData = window.localStorage.getItem('latestChartData');
+        let hasCachedChart = false;
+        if (cachedChartData) {
+          try {
+            const parsedChart: ChartData = JSON.parse(cachedChartData);
+            setChartData(parsedChart);
+            hasCachedChart = true;
+          } catch (cacheErr) {
+            console.warn('Failed to parse cached chart data:', cacheErr);
+            window.localStorage.removeItem('latestChartData');
+          }
+        }
+
+        try {
+          const response = await astrologyAPI.calculateChart(parsedBirthInfo);
+          if (response.success && response.data) {
+            setChartData(response.data);
+            window.localStorage.setItem('latestChartData', JSON.stringify(response.data));
+          } else if (!hasCachedChart) {
+            setError(response.message || response.error || '占星数据获取失败');
+          }
+        } catch (networkErr) {
+          console.error('Failed to refresh chart data', networkErr);
+          if (!hasCachedChart) {
+            setError('占星数据获取失败，请稍后重试');
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load chart data', err);
+        setError('占星数据获取失败，请稍后重试');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadChartData();
+  }, []);
+
+  const effectiveBirthInfo = birthInfoState ?? fallbackBirthInfo;
+
+  const displayCoreTrinity = useMemo(() => ({
+    lagna: {
+      ...coreTrinity.lagna,
+      sign: chartData?.risingSign || coreTrinity.lagna.sign,
+    },
+    moon: {
+      ...coreTrinity.moon,
+      sign: chartData?.moonSign || coreTrinity.moon.sign,
+    },
+    sun: {
+      ...coreTrinity.sun,
+      sign: chartData?.sunSign || coreTrinity.sun.sign,
+    },
+  }), [chartData]);
+
+  const displayLifeArenas = useMemo(() => {
+    if (!chartData) {
+      return lifeArenas;
+    }
+
+    return chartData.houses.map((house) => {
+      const fallback = lifeArenas.find((arena) => arena.house === house.number);
+      const planetsIn = house.planets.map(
+        (planet) => `${planet.name}${planet.signSymbol ? ` ${planet.signSymbol}` : ''}`
+      );
+
+      return {
+        ...fallback,
+        house: house.number,
+        name: house.name || fallback?.name || `第${house.number}宫`,
+        nameEn: house.nameEn || fallback?.nameEn || '',
+        sanskrit: house.sanskrit || fallback?.sanskrit || '',
+        emoji: fallback?.emoji || '🏠',
+        rating: fallback?.rating ?? 3,
+        sign: house.signSymbol ? `${house.sign} ${house.signSymbol}` : house.sign,
+        lord: house.lord || fallback?.lord || '未知',
+        lordPlacement: house.lordPlacement || fallback?.lordPlacement || '未知',
+        lordStrength: house.lordStrength || fallback?.lordStrength || '未知',
+        planetsIn: planetsIn.length > 0 ? planetsIn : fallback?.planetsIn || [],
+        aspects: fallback?.aspects || [],
+      };
+    });
+  }, [chartData]);
+
   // 当前年龄和时间轴位置
-  const currentYear = 2025;
-  const birthYear = 1995;
+  const currentYear = new Date().getFullYear();
+  const birthYear = new Date(effectiveBirthInfo.date).getFullYear();
   const currentAge = currentYear - birthYear;
 
   const renderStarRating = (rating: number) => {
@@ -249,6 +352,31 @@ export default function DashboardPage() {
       </div>
     );
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#1A1430] text-white gap-3">
+        <div className="text-4xl">🌟</div>
+        <div className="text-lg">正在加载你的星盘数据...</div>
+      </div>
+    );
+  }
+
+  if (error && !chartData) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#1A1430] text-white gap-3 px-6 text-center">
+        <div className="text-4xl">😔</div>
+        <div className="text-lg">加载星盘数据时出现问题</div>
+        <p className="text-sm text-purple-200">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 transition-colors"
+        >
+          重新尝试
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -424,7 +552,7 @@ export default function DashboardPage() {
                   transition={{ delay: 0.3 }}
                   className="text-xl text-[#E8D5F2] mb-3 font-light"
                 >
-                  {birthInfo.name}, this is your celestial blueprint ✨
+                  {effectiveBirthInfo.name}, this is your celestial blueprint ✨
                 </motion.p>
                 <motion.div 
                   initial={{ opacity: 0 }}
@@ -433,7 +561,7 @@ export default function DashboardPage() {
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[rgba(255,182,217,0.15)] backdrop-blur-sm border border-[rgba(255,182,217,0.3)] shadow-lg"
                 >
                   <span className="text-sm text-[#FFB6D9]">
-                    {birthInfo.date} • {birthInfo.time} • {birthInfo.city}
+                    {effectiveBirthInfo.date} • {effectiveBirthInfo.time} • {effectiveBirthInfo.city}
                   </span>
                 </motion.div>
               </div>
@@ -482,7 +610,7 @@ export default function DashboardPage() {
                   animate={{ rotate: [0, 10, 0] }}
                   transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  {coreTrinity.lagna.emoji}
+                  {displayCoreTrinity.lagna.emoji}
                 </motion.div>
                 <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
@@ -492,12 +620,12 @@ export default function DashboardPage() {
                     whileHover={{ rotate: [0, -10, 10, 0] }}
                     transition={{ duration: 0.5 }}
                   >
-                    <span className="text-3xl">{coreTrinity.lagna.emoji}</span>
+                    <span className="text-3xl">{displayCoreTrinity.lagna.emoji}</span>
                   </motion.div>
                   <div className="text-[10px] text-amber-600 mb-2 font-semibold uppercase tracking-[0.15em] letterspacing-wider">Your First Impression</div>
-                  <div className="font-serif text-2xl mb-3 text-gray-800">Rising {coreTrinity.lagna.sign}</div>
-                  <p className="text-sm text-amber-700/80 mb-4 italic leading-relaxed">{coreTrinity.lagna.mask}</p>
-                  <p className="text-sm text-gray-600 leading-relaxed">{coreTrinity.lagna.desc}</p>
+                  <div className="font-serif text-2xl mb-3 text-gray-800">Rising {displayCoreTrinity.lagna.sign}</div>
+                  <p className="text-sm text-amber-700/80 mb-4 italic leading-relaxed">{displayCoreTrinity.lagna.mask}</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">{displayCoreTrinity.lagna.desc}</p>
                 </div>
               </motion.div>
 
@@ -514,7 +642,7 @@ export default function DashboardPage() {
                   animate={{ y: [0, -10, 0] }}
                   transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  {coreTrinity.moon.emoji}
+                  {displayCoreTrinity.moon.emoji}
                 </motion.div>
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
@@ -524,12 +652,12 @@ export default function DashboardPage() {
                     whileHover={{ scale: [1, 1.1, 1] }}
                     transition={{ duration: 0.5 }}
                   >
-                    <span className="text-3xl">{coreTrinity.moon.emoji}</span>
+                    <span className="text-3xl">{displayCoreTrinity.moon.emoji}</span>
                   </motion.div>
                   <div className="text-[10px] text-blue-600 mb-2 font-semibold uppercase tracking-[0.15em]">Your Inner World</div>
-                  <div className="font-serif text-2xl mb-3 text-gray-800">Moon {coreTrinity.moon.sign}</div>
-                  <p className="text-sm text-blue-700/80 mb-4 italic leading-relaxed">{coreTrinity.moon.need}</p>
-                  <p className="text-sm text-gray-600 leading-relaxed">{coreTrinity.moon.desc}</p>
+                  <div className="font-serif text-2xl mb-3 text-gray-800">Moon {displayCoreTrinity.moon.sign}</div>
+                  <p className="text-sm text-blue-700/80 mb-4 italic leading-relaxed">{displayCoreTrinity.moon.need}</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">{displayCoreTrinity.moon.desc}</p>
                 </div>
               </motion.div>
 
@@ -546,7 +674,7 @@ export default function DashboardPage() {
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  {coreTrinity.sun.emoji}
+                  {displayCoreTrinity.sun.emoji}
                 </motion.div>
                 <div className="absolute inset-0 bg-gradient-to-br from-rose-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
@@ -556,12 +684,12 @@ export default function DashboardPage() {
                     whileHover={{ rotate: [0, 360] }}
                     transition={{ duration: 0.8 }}
                   >
-                    <span className="text-3xl">{coreTrinity.sun.emoji}</span>
+                    <span className="text-3xl">{displayCoreTrinity.sun.emoji}</span>
                   </motion.div>
                   <div className="text-[10px] text-rose-600 mb-2 font-semibold uppercase tracking-[0.15em]">Your Life Force</div>
-                  <div className="font-serif text-2xl mb-3 text-gray-800">Sun {coreTrinity.sun.sign}</div>
-                  <p className="text-sm text-rose-700/80 mb-4 italic leading-relaxed">{coreTrinity.sun.fuel}</p>
-                  <p className="text-sm text-gray-600 leading-relaxed">{coreTrinity.sun.desc}</p>
+                  <div className="font-serif text-2xl mb-3 text-gray-800">Sun {displayCoreTrinity.sun.sign}</div>
+                  <p className="text-sm text-rose-700/80 mb-4 italic leading-relaxed">{displayCoreTrinity.sun.fuel}</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">{displayCoreTrinity.sun.desc}</p>
                 </div>
               </motion.div>
             </div>
@@ -690,7 +818,7 @@ export default function DashboardPage() {
 
             {/* 简化版网格布局 - 仍保持易用性 */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
-              {lifeArenas.map((arena, idx) => {
+              {displayLifeArenas.map((arena, idx) => {
                 const getHouseColor = (rating: number) => {
                   if (rating === 5) return 'from-[#FFB6D9]/30 to-[#FFC8E3]/30';
                   if (rating === 4) return 'from-[#E8B4D9]/30 to-[#C7B8EA]/30';
@@ -729,7 +857,7 @@ export default function DashboardPage() {
             {/* Professional Detail Panel */}
             <AnimatePresence>
               {selectedArena && (() => {
-                const arena = lifeArenas.find(a => a.house === selectedArena);
+                const arena = displayLifeArenas.find(a => a.house === selectedArena);
                 if (!arena) return null;
                 
                 // 检查是否有完整专业数据

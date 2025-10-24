@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端连接测试</title>
+</head>
+<body>
+    <h1>前端到后端连接测试</h1>
+    <button onclick="testConnection()">测试连接</button>
+    <div id="result"></div>
+
+    <script>
+        async function testConnection() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>正在测试连接...</p>';
+            
+            try {
+                // 测试后端健康检查
+                const healthResponse = await fetch('http://localhost:3001/api/health');
+                const healthData = await healthResponse.json();
+                
+                if (healthData.status === 'healthy') {
+                    resultDiv.innerHTML += '<p style="color: green;">✅ 后端健康检查通过</p>';
+                } else {
+                    resultDiv.innerHTML += '<p style="color: red;">❌ 后端健康检查失败</p>';
+                    return;
+                }
+                
+                // 测试占星API
+                const astrologyResponse = await fetch('http://localhost:3001/api/astrology/chart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: "连接测试",
+                        date: "1990-01-01",
+                        time: "12:00",
+                        city: "北京",
+                        latitude: 39.9042,
+                        longitude: 116.4074,
+                        timezone: "Asia/Shanghai"
+                    })
+                });
+                
+                if (!astrologyResponse.ok) {
+                    throw new Error(`HTTP error! status: ${astrologyResponse.status}`);
+                }
+                
+                const astrologyData = await astrologyResponse.json();
+                
+                if (astrologyData.success) {
+                    resultDiv.innerHTML += `
+                        <p style="color: green;">✅ 占星API调用成功</p>
+                        <p><strong>姓名:</strong> ${astrologyData.data.birthInfo.name}</p>
+                        <p><strong>数据源:</strong> ${astrologyData.data.source || '免费API'}</p>
+                        <p><strong>行星数量:</strong> ${astrologyData.data.planets.length}</p>
+                        <p><strong>宫位数量:</strong> ${astrologyData.data.houses.length}</p>
+                        <p style="color: green;">🎉 前后端连接完全正常！</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML += '<p style="color: red;">❌ 占星API调用失败</p>';
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML += `<p style="color: red;">❌ 连接失败: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

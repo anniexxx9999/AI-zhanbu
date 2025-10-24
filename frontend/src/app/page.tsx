@@ -157,7 +157,7 @@ export default function HomePage() {
                   ))}
                 </div>
                 <p className="text-text-secondary leading-relaxed">
-                  "{testimonial.text}"
+                  &ldquo;{testimonial.text}&rdquo;
                 </p>
               </Card>
             ))}
@@ -227,8 +227,8 @@ export default function HomePage() {
                     <div className="absolute inset-0 bg-gradient-to-br from-rose-pink/20 to-lavender-light/20 blur-3xl" />
                     <div className="relative p-6">
                       <p className="text-text-secondary leading-relaxed mb-6">
-                        "TA的内心世界充满好奇心与求知欲，像一本永远读不完的书。
-                        你们很可能在学习或交流的场景中相遇，那将是一场思想的火花碰撞..."
+                        &ldquo;TA的内心世界充满好奇心与求知欲，像一本永远读不完的书。
+                        你们很可能在学习或交流的场景中相遇，那将是一场思想的火花碰撞...&rdquo;
                       </p>
                       <div className="h-32 bg-gradient-to-b from-transparent to-twilight-deep flex items-end justify-center pb-4">
                         <Button onClick={() => router.push('/birth-info')}>
@@ -307,5 +307,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-

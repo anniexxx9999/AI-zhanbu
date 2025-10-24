@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API测试</title>
+</head>
+<body>
+    <h1>API连接测试</h1>
+    <button onclick="testAPI()">测试API调用</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            try {
+                const response = await fetch('http://localhost:3001/api/astrology/chart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: "测试用户",
+                        date: "1990-01-01",
+                        time: "12:00",
+                        city: "北京",
+                        latitude: 39.9042,
+                        longitude: 116.4074,
+                        timezone: "Asia/Shanghai"
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                document.getElementById('result').innerHTML = `
+                    <h2>API调用成功！</h2>
+                    <p><strong>成功:</strong> ${data.success}</p>
+                    <p><strong>姓名:</strong> ${data.data.birthInfo.name}</p>
+                    <p><strong>数据源:</strong> ${data.data.source}</p>
+                    <p><strong>行星数量:</strong> ${data.data.planets.length}</p>
+                    <p><strong>宫位数量:</strong> ${data.data.houses.length}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <h2>API调用失败</h2>
+                    <p style="color: red;">错误: ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

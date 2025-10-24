@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 import { FiUser, FiCalendar, FiClock, FiMapPin } from 'react-icons/fi';
+import { astrologyAPI } from '@/services/api';
 
 export default function BirthInfoPage() {
   const router = useRouter();
@@ -19,6 +20,8 @@ export default function BirthInfoPage() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isDefaultData, setIsDefaultData] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const clearDefaultData = () => {
     setFormData({
@@ -31,7 +34,7 @@ export default function BirthInfoPage() {
     setErrors({});
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // 简单验证
@@ -47,8 +50,26 @@ export default function BirthInfoPage() {
     }
 
     // 保存到 localStorage 并跳转
-    localStorage.setItem('birthInfo', JSON.stringify(formData));
-    router.push('/dashboard');
+    try {
+      setSubmitting(true);
+      setSubmitError(null);
+
+      const response = await astrologyAPI.calculateChart(formData);
+
+      if (!response.success || !response.data) {
+        throw new Error(response.message || response.error || '星盘生成失败，请稍后重试');
+      }
+
+      localStorage.setItem('birthInfo', JSON.stringify(formData));
+      localStorage.setItem('latestChartData', JSON.stringify(response.data));
+
+      router.push('/dashboard');
+    } catch (err) {
+      console.error('Failed to submit birth info:', err);
+      setSubmitError(err instanceof Error ? err.message : '星盘生成失败，请稍后重试');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -82,6 +103,16 @@ export default function BirthInfoPage() {
             </motion.p>
           </div>
 
+          {submitError && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-100 rounded-xl text-sm"
+            >
+              {submitError}
+            </motion.div>
+          )}
+
           {/* Form Card */}
           <Card glow="purple">
             {/* Default Data Notice */}
@@ -100,7 +131,7 @@ export default function BirthInfoPage() {
                         正在使用示例数据
                       </p>
                       <p className="text-xs text-purple-200">
-                        点击"输入我的信息"来替换为您的真实出生信息
+                        点击 &quot;输入我的信息&quot; 来替换为您的真实出生信息
                       </p>
                     </div>
                   </div>
@@ -188,8 +219,9 @@ export default function BirthInfoPage() {
                 size="lg"
                 fullWidth
                 icon="✨"
+                disabled={submitting}
               >
-                揭示我的命盘
+                {submitting ? '星盘生成中...' : '揭示我的命盘'}
               </Button>
 
               {/* Back Link */}
@@ -230,5 +262,3 @@ export default function BirthInfoPage() {
     </div>
   );
 }
-
-
