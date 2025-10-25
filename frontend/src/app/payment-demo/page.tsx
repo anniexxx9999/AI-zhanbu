@@ -167,7 +167,7 @@ export default function PaymentDemoPage() {
                 </div>
               </Card>
               
-              <Card glow="blue">
+              <Card glow="purple">
                 <div className="text-center p-6">
                   <FiTrendingUp className="w-8 h-8 text-blue-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-white mb-2">紧迫感营造</h3>
@@ -196,7 +196,7 @@ export default function PaymentDemoPage() {
             transition={{ delay: 0.6 }}
             className="mb-16"
           >
-            <Card glow="green" className="p-8">
+            <Card glow="purple" className="p-8">
               <h2 className="text-2xl font-display gradient-text mb-6 text-center">
                 🎯 转化率优化策略
               </h2>
@@ -263,7 +263,7 @@ export default function PaymentDemoPage() {
                 </ul>
               </Card>
               
-              <Card glow="blue">
+              <Card glow="purple">
                 <h3 className="text-lg font-semibold text-white mb-4">优化指标</h3>
                 <ul className="space-y-2 text-purple-300 text-sm">
                   <li>• 点击率 (CTR)</li>

@@ -2,10 +2,13 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 export default function Navigation() {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useLanguage();
 
   return (
     <nav className="sticky top-0 z-50 bg-twilight-deep/80 backdrop-blur-md border-b border-white/10">
@@ -40,7 +43,7 @@ export default function Navigation() {
                 : 'text-purple-300 hover:text-white'
             }`}>
               <span className="text-sm">🌙</span>
-              <span className="text-sm">My Soul</span>
+              <span className="text-sm">{t('navigation.dashboard')}</span>
             </div>
             {pathname === '/dashboard' && (
               <motion.div 
@@ -72,7 +75,7 @@ export default function Navigation() {
               >
                 💕
               </motion.span>
-              <span className="text-sm">My Soulmate</span>
+              <span className="text-sm">{t('report.spouse.title')}</span>
             </div>
             {pathname === '/report/spouse' && (
               <motion.div 
@@ -95,14 +98,15 @@ export default function Navigation() {
             onClick={() => router.push('/birth-info')}
             className="text-xs text-purple-300 hover:text-white transition hidden lg:block"
           >
-            Birth Info
+            {t('birthInfo.title')}
           </button>
           <button 
             onClick={() => router.push('/pricing')}
             className="text-xs text-purple-300 hover:text-white transition hidden lg:block"
           >
-            Pricing
+            {t('navigation.pricing')}
           </button>
+          <LanguageSwitcher />
           <button className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white text-sm hover:shadow-lg transition">
             X
           </button>

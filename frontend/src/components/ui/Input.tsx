@@ -43,7 +43,7 @@ export default function Input({
         )}
         
         <motion.input
-          {...props}
+          {...(props as any)}
           className={`
             input-field
             ${icon ? 'pl-12' : ''}

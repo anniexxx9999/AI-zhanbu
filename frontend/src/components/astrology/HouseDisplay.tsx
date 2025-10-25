@@ -80,12 +80,15 @@ export default function HouseDisplay({
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className="relative"
     >
-      <Card 
-        glow="purple" 
+      <div
         className="relative overflow-hidden"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
+        <Card
+          glow="purple"
+          className="relative"
+        >
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-blue-500/20" />
@@ -233,7 +236,8 @@ export default function HouseDisplay({
           animate={{ opacity: isHovered ? 1 : 0 }}
           transition={{ duration: 0.3 }}
         />
-      </Card>
-    </motion.div>
+        </Card>
+      </div>
+      </motion.div>
   );
 }

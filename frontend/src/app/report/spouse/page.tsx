@@ -9,9 +9,11 @@ import Card from '@/components/ui/Card';
 import Navigation from '@/components/layout/Navigation';
 import SoulmatePortrait from '@/components/ai/SoulmatePortrait';
 import { FiShare2, FiDownload, FiHeart, FiStar, FiClock, FiUsers, FiTrendingUp, FiShield, FiZap } from 'react-icons/fi';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function SpouseReportPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [birthInfo, setBirthInfo] = useState<any>(null);
   const [isTyping, setIsTyping] = useState(true);
 
@@ -48,19 +50,19 @@ export default function SpouseReportPage() {
           >
             <div className="mb-8">
               <h1 className="text-4xl md:text-6xl font-display gradient-text mb-4">
-                🔮 印占婚姻命盘分析报告
+                {t('report.spouse.title')}
               </h1>
               <p className="text-xl text-purple-300 mb-6">
-                Vedic Marriage & Soulmate Analysis Report
+                {t('report.spouse.subtitle')}
               </p>
               <div className="flex items-center justify-center gap-4 text-sm text-purple-400">
                 <span className="flex items-center gap-2">
                   <FiClock className="w-4 h-4" />
-                  生成于 2025.01.12
+                  {t('report.spouse.generated')} 2025.01.12
                 </span>
                 <span className="flex items-center gap-2">
                   <FiUsers className="w-4 h-4" />
-                  咨询者: {birthInfo?.name || '您'}
+                  {t('report.spouse.client')}: {birthInfo?.name || 'You'}
                 </span>
               </div>
             </div>
@@ -82,10 +84,10 @@ export default function SpouseReportPage() {
               <div className="mb-6">
                 <h2 className="text-3xl font-display mb-4">🙏 Namaste</h2>
                 <p className="text-lg text-purple-300 mb-4">
-                  欢迎您，亲爱的求知者。在这浩瀚的星辰之海中，蕴藏着您生命蓝图的深刻密码。
+                  {t('report.spouse.welcome')}
                 </p>
                 <p className="text-base text-purple-400">
-                  今日，我们将共同解读您的命盘（Kundali），专注于其中至关重要的篇章——婚姻与伴侣关系（Vivaha）。
+                  {t('report.spouse.intro')}
                 </p>
               </div>
             </Card>
@@ -99,32 +101,32 @@ export default function SpouseReportPage() {
             className="mb-16"
           >
             <h2 className="text-3xl font-display gradient-text mb-8 text-center">
-              📊 命盘基本信息
+              {t('report.spouse.basicInfo')}
             </h2>
             
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               <Card glow="purple">
                 <div className="text-center">
                   <div className="text-4xl mb-3">♊</div>
-                  <h3 className="text-xl font-semibold mb-2">上升星座</h3>
+                  <h3 className="text-xl font-semibold mb-2">{t('report.spouse.risingSign')}</h3>
                   <p className="text-lg text-purple-300">Mithuna (双子座)</p>
                   <p className="text-sm text-purple-400">聪慧、善于沟通</p>
                 </div>
               </Card>
               
-              <Card glow="blue">
+              <Card glow="purple">
                 <div className="text-center">
                   <div className="text-4xl mb-3">🌙</div>
-                  <h3 className="text-xl font-semibold mb-2">月亮星座</h3>
+                  <h3 className="text-xl font-semibold mb-2">{t('report.spouse.moonSign')}</h3>
                   <p className="text-lg text-blue-300">Makara (摩羯座)</p>
                   <p className="text-sm text-blue-400">坚韧、务实、负责</p>
                 </div>
               </Card>
               
-              <Card glow="red">
+              <Card glow="purple">
                 <div className="text-center">
                   <div className="text-4xl mb-3">☉</div>
-                  <h3 className="text-xl font-semibold mb-2">太阳星座</h3>
+                  <h3 className="text-xl font-semibold mb-2">{t('report.spouse.sunSign')}</h3>
                   <p className="text-lg text-red-300">Vrishchika (天蝎座)</p>
                   <p className="text-sm text-red-400">深邃、有力、转化</p>
                 </div>
@@ -140,7 +142,7 @@ export default function SpouseReportPage() {
             className="mb-16"
           >
             <h2 className="text-3xl font-display gradient-text mb-8 text-center">
-              💍 第一部分：个人婚姻潜力与模式分析
+              {t('report.spouse.part1')}
             </h2>
             
             <div className="space-y-8">
@@ -198,7 +200,7 @@ export default function SpouseReportPage() {
             className="mb-16"
           >
             <h2 className="text-3xl font-display gradient-text mb-8 text-center">
-              👤 第二部分：未来伴侣的特质与来源
+              {t('report.spouse.part2')}
             </h2>
             
             <div className="grid md:grid-cols-2 gap-8">
@@ -224,7 +226,7 @@ export default function SpouseReportPage() {
                 </div>
               </Card>
 
-              <Card glow="blue">
+              <Card glow="purple">
                 <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <FiTrendingUp className="text-blue-400" />
                   职业倾向与相遇方式
@@ -255,10 +257,10 @@ export default function SpouseReportPage() {
             className="mb-16"
           >
             <h2 className="text-3xl font-display gradient-text mb-8 text-center">
-              ⏰ 第三部分：婚姻时机的判断
+              {t('report.spouse.part3')}
             </h2>
             
-            <Card glow="green">
+            <Card glow="purple">
               <h3 className="text-2xl font-semibold mb-6 flex items-center gap-3">
                 <FiClock className="text-green-400" />
                 主运与次运分析
@@ -268,7 +270,7 @@ export default function SpouseReportPage() {
                   <h4 className="text-lg font-semibold text-green-300 mb-2">当前大运</h4>
                   <p className="text-green-200">
                     您当前正处于<strong>木星大运（Guru Mahadasha）</strong>之中（2016-2032）。
-                    大运主木星本身就是您的第七宫主，这16年是您婚姻的"大环境机遇期"。
+                    大运主木星本身就是您的第七宫主，这16年是您婚姻的&ldquo;大环境机遇期&rdquo;。
                   </p>
                 </div>
                 
@@ -276,7 +278,7 @@ export default function SpouseReportPage() {
                   <h4 className="text-lg font-semibold text-yellow-300 mb-2">关键时期</h4>
                   <p className="text-yellow-200">
                     木星大运-金星次运（Guru-Shukra Dasha）（2024年6月 - 2027年2月）是启动婚姻的最关键时期。
-                    大运主（七宫主）与次运主（婚姻指示星）在本命盘中紧密合相，这是最强烈的"正缘"信号。
+                    大运主（七宫主）与次运主（婚姻指示星）在本命盘中紧密合相，这是最强烈的&ldquo;正缘&rdquo;信号。
                   </p>
                 </div>
                 
@@ -300,7 +302,7 @@ export default function SpouseReportPage() {
             className="mb-16"
           >
             <h2 className="text-3xl font-display gradient-text mb-8 text-center">
-              💕 第四部分：婚后生活质量与挑战
+              {t('report.spouse.part4')}
             </h2>
             
             <div className="grid md:grid-cols-2 gap-8">
@@ -334,7 +336,7 @@ export default function SpouseReportPage() {
                 </div>
               </Card>
 
-              <Card glow="orange">
+              <Card glow="purple">
                 <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <FiShield className="text-orange-400" />
                   潜在挑战
@@ -366,7 +368,7 @@ export default function SpouseReportPage() {
             className="mb-16"
           >
             <h2 className="text-3xl font-display gradient-text mb-8 text-center">
-              🧘 第五部分：建议与补救措施
+              {t('report.spouse.part5')}
             </h2>
             
             <div className="grid md:grid-cols-3 gap-6">
@@ -387,7 +389,7 @@ export default function SpouseReportPage() {
                 </ul>
               </Card>
 
-              <Card glow="blue">
+              <Card glow="purple">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <FiShield className="text-blue-400" />
                   应对挑战
@@ -431,7 +433,7 @@ export default function SpouseReportPage() {
             className="mb-16"
           >
             <Card glow="gold" className="text-center">
-              <h2 className="text-3xl font-display mb-6">🙏 结语：总结与祝福</h2>
+              <h2 className="text-3xl font-display mb-6">{t('report.spouse.conclusion')}</h2>
               <div className="space-y-4 text-purple-300">
                 <p className="text-lg leading-relaxed">
                   您的命盘描绘了一段非凡的婚姻之旅，它被智慧、爱与前世的福报所深深祝福。

@@ -1,0 +1,696 @@
+{
+  "success": true,
+  "data": {
+    "birthInfo": {
+      "name": "Test User",
+      "date": "1990-05-15",
+      "time": "10:30",
+      "city": "Beijing",
+      "latitude": 39.9042,
+      "longitude": 116.4074,
+      "timezone": "Asia/Shanghai"
+    },
+    "planets": [
+      {
+        "name": "Sun",
+        "symbol": "☉",
+        "longitude": 30.25169544075829,
+        "latitude": 0,
+        "house": 10,
+        "sign": "Taurus",
+        "signSymbol": "♉",
+        "degree": 0,
+        "minute": 15,
+        "second": 6,
+        "retrograde": false,
+        "speed": 0
+      },
+      {
+        "name": "Moon",
+        "symbol": "☽",
+        "longitude": 268.0556389587258,
+        "latitude": 0,
+        "house": 6,
+        "sign": "Sagittarius",
+        "signSymbol": "♐",
+        "degree": 28,
+        "minute": 3,
+        "second": 20,
+        "retrograde": false,
+        "speed": 0
+      },
+      {
+        "name": "Mercury",
+        "symbol": "☿",
+        "longitude": 14.349734329234224,
+        "latitude": 0,
+        "house": 10,
+        "sign": "Aries",
+        "signSymbol": "♈",
+        "degree": 14,
+        "minute": 20,
+        "second": 59,
+        "retrograde": true,
+        "speed": 0
+      },
+      {
+        "name": "Venus",
+        "symbol": "♀",
+        "longitude": 348.59690600554217,
+        "latitude": 0,
+        "house": 9,
+        "sign": "Pisces",
+        "signSymbol": "♓",
+        "degree": 18,
+        "minute": 35,
+        "second": 49,
+        "retrograde": false,
+        "speed": 0
+      },
+      {
+        "name": "Mars",
+        "symbol": "♂",
+        "longitude": 324.28634262127827,
+        "latitude": 0,
+        "house": 8,
+        "sign": "Aquarius",
+        "signSymbol": "♒",
+        "degree": 24,
+        "minute": 17,
+        "second": 11,
+        "retrograde": false,
+        "speed": 0
+      },
+      {
+        "name": "Jupiter",
+        "symbol": "♃",
+        "longitude": 75.73656038204057,
+        "latitude": 0,
+        "house": 12,
+        "sign": "Gemini",
+        "signSymbol": "♊",
+        "degree": 15,
+        "minute": 44,
+        "second": 12,
+        "retrograde": false,
+        "speed": 0
+      },
+      {
+        "name": "Saturn",
+        "symbol": "♄",
+        "longitude": 271.5341187838446,
+        "latitude": 0,
+        "house": 6,
+        "sign": "Capricorn",
+        "signSymbol": "♑",
+        "degree": 1,
+        "minute": 32,
+        "second": 3,
+        "retrograde": true,
+        "speed": 0
+      },
+      {
+        "name": "Rahu",
+        "symbol": "☊",
+        "longitude": 287.63977268669345,
+        "latitude": 0,
+        "house": 7,
+        "sign": "Capricorn",
+        "signSymbol": "♑",
+        "degree": 17,
+        "minute": 38,
+        "second": 23,
+        "retrograde": true,
+        "speed": 0
+      },
+      {
+        "name": "Ketu",
+        "symbol": "☋",
+        "longitude": 107.63977268669345,
+        "latitude": 0,
+        "house": 1,
+        "sign": "Cancer",
+        "signSymbol": "♋",
+        "degree": 17,
+        "minute": 38,
+        "second": 23,
+        "retrograde": true,
+        "speed": 0
+      }
+    ],
+    "houses": [
+      {
+        "number": 1,
+        "name": "自我与个性",
+        "nameEn": "Self & Personality",
+        "sanskrit": "Lagna",
+        "planets": [
+          {
+            "name": "Ketu",
+            "symbol": "☋",
+            "longitude": 107.63977268669345,
+            "latitude": 0,
+            "house": 1,
+            "sign": "Cancer",
+            "signSymbol": "♋",
+            "degree": 17,
+            "minute": 38,
+            "second": 23,
+            "retrograde": true,
+            "speed": 0
+          }
+        ],
+        "sign": "Cancer",
+        "lord": "Mars",
+        "lordPlacement": "Unknown",
+        "lordStrength": "Unknown",
+        "signSymbol": "♋"
+      },
+      {
+        "number": 2,
+        "name": "财富与资源",
+        "nameEn": "Wealth & Resources",
+        "sanskrit": "Dhana",
+        "planets": [],
+        "sign": "Leo",
+        "lord": "Venus",
+        "lordPlacement": "Unknown",
+        "lordStrength": "Unknown",
+        "signSymbol": "♌"
+      },
+      {
+        "number": 3,
+        "name": "沟通与学习",
+        "nameEn": "Communication & Learning",
+        "sanskrit": "Sahaja",
+        "planets": [],
+        "sign": "Virgo",
+        "lord": "Mercury",
+        "lordPlacement": "Unknown",
+        "lordStrength": "Unknown",
+        "signSymbol": "♍"
+      },
+      {
+        "number": 4,
+        "name": "家庭与根基",
+        "nameEn": "Home & Foundation",
+        "sanskrit": "Sukha",
+        "planets": [],
+        "sign": "Libra",
+        "lord": "Moon",
+        "lordPlacement": "Unknown",
+        "lordStrength": "Unknown",
+        "signSymbol": "♎"
+      },
+      {
+        "number": 5,
+        "name": "创意与子女",
+        "nameEn": "Creativity & Children",
+        "sanskrit": "Putra",
+        "planets": [],
+        "sign": "Scorpio",
+        "lord": "Sun",
+        "lordPlacement": "Unknown",
+        "lordStrength": "Unknown",
+        "signSymbol": "♏"
+      },
+      {
+        "number": 6,
+        "name": "健康与服务",
+        "nameEn": "Health & Service",
+        "sanskrit": "Ari",
+        "planets": [
+          {
+            "name": "Moon",
+            "symbol": "☽",
+            "longitude": 268.0556389587258,
+            "latitude": 0,
+            "house": 6,
+            "sign": "Sagittarius",
+            "signSymbol": "♐",
+            "degree": 28,
+            "minute": 3,
+            "second": 20,
+            "retrograde": false,
+            "speed": 0
+          },
+          {
+            "name": "Saturn",
+            "symbol": "♄",
+            "longitude": 271.5341187838446,
+            "latitude": 0,
+            "house": 6,
+            "sign": "Capricorn",
+            "signSymbol": "♑",
+            "degree": 1,
+            "minute": 32,
+            "second": 3,
+            "retrograde": true,
+            "speed": 0
+          }
+        ],
+        "sign": "Sagittarius",
+        "lord": "Mercury",
+        "lordPlacement": "Unknown",
+        "lordStrength": "Unknown",
+        "signSymbol": "♐"
+      },
+      {
+        "number": 7,
+        "name": "伴侣与婚姻",
+        "nameEn": "Partnership & Marriage",
+        "sanskrit": "Kalatra",
+        "planets": [
+          {
+            "name": "Rahu",
+            "symbol": "☊",
+            "longitude": 287.63977268669345,
+            "latitude": 0,
+            "house": 7,
+            "sign": "Capricorn",
+            "signSymbol": "♑",
+            "degree": 17,
+            "minute": 38,
+            "second": 23,
+            "retrograde": true,
+            "speed": 0
+          }
+        ],
+        "sign": "Capricorn",
+        "lord": "Venus",
+        "lordPlacement": "Unknown",
+        "lordStrength": "Unknown",
+        "signSymbol": "♑"
+      },
+      {
+        "number": 8,
+        "name": "转变与重生",
+        "nameEn": "Transformation & Rebirth",
+        "sanskrit": "Ayu",
+        "planets": [
+          {
+            "name": "Mars",
+            "symbol": "♂",
+            "longitude": 324.28634262127827,
+            "latitude": 0,
+            "house": 8,
+            "sign": "Aquarius",
+            "signSymbol": "♒",
+            "degree": 24,
+            "minute": 17,
+            "second": 11,
+            "retrograde": false,
+            "speed": 0
+          }
+        ],
+        "sign": "Aquarius",
+        "lord": "Mars",
+        "lordPlacement": "Unknown",
+        "lordStrength": "Unknown",
+        "signSymbol": "♒"
+      },
+      {
+        "number": 9,
+        "name": "智慧与哲学",
+        "nameEn": "Wisdom & Philosophy",
+        "sanskrit": "Bhagya",
+        "planets": [
+          {
+            "name": "Venus",
+            "symbol": "♀",
+            "longitude": 348.59690600554217,
+            "latitude": 0,
+            "house": 9,
+            "sign": "Pisces",
+            "signSymbol": "♓",
+            "degree": 18,
+            "minute": 35,
+            "second": 49,
+            "retrograde": false,
+            "speed": 0
+          }
+        ],
+        "sign": "Pisces",
+        "lord": "Jupiter",
+        "lordPlacement": "Unknown",
+        "lordStrength": "Unknown",
+        "signSymbol": "♓"
+      },
+      {
+        "number": 10,
+        "name": "事业与声誉",
+        "nameEn": "Career & Reputation",
+        "sanskrit": "Karma",
+        "planets": [
+          {
+            "name": "Sun",
+            "symbol": "☉",
+            "longitude": 30.25169544075829,
+            "latitude": 0,
+            "house": 10,
+            "sign": "Taurus",
+            "signSymbol": "♉",
+            "degree": 0,
+            "minute": 15,
+            "second": 6,
+            "retrograde": false,
+            "speed": 0
+          },
+          {
+            "name": "Mercury",
+            "symbol": "☿",
+            "longitude": 14.349734329234224,
+            "latitude": 0,
+            "house": 10,
+            "sign": "Aries",
+            "signSymbol": "♈",
+            "degree": 14,
+            "minute": 20,
+            "second": 59,
+            "retrograde": true,
+            "speed": 0
+          }
+        ],
+        "sign": "Aries",
+        "lord": "Saturn",
+        "lordPlacement": "Unknown",
+        "lordStrength": "Unknown",
+        "signSymbol": "♈"
+      },
+      {
+        "number": 11,
+        "name": "友谊与愿望",
+        "nameEn": "Friendship & Wishes",
+        "sanskrit": "Labha",
+        "planets": [],
+        "sign": "Taurus",
+        "lord": "Saturn",
+        "lordPlacement": "Unknown",
+        "lordStrength": "Unknown",
+        "signSymbol": "♉"
+      },
+      {
+        "number": 12,
+        "name": "潜意识与解脱",
+        "nameEn": "Subconscious & Liberation",
+        "sanskrit": "Vyaya",
+        "planets": [
+          {
+            "name": "Jupiter",
+            "symbol": "♃",
+            "longitude": 75.73656038204057,
+            "latitude": 0,
+            "house": 12,
+            "sign": "Gemini",
+            "signSymbol": "♊",
+            "degree": 15,
+            "minute": 44,
+            "second": 12,
+            "retrograde": false,
+            "speed": 0
+          }
+        ],
+        "sign": "Gemini",
+        "lord": "Jupiter",
+        "lordPlacement": "Unknown",
+        "lordStrength": "Unknown",
+        "signSymbol": "♊"
+      }
+    ],
+    "aspects": [
+      {
+        "from": "Moon",
+        "to": "Saturn",
+        "type": "conjunction",
+        "orb": 3.478479825118768,
+        "strength": 0.565190021860154,
+        "description": "Moon conjunct Saturn"
+      }
+    ],
+    "lagna": 93.97458711671476,
+    "lagnaDetails": {
+      "longitude": 93.97458711671476,
+      "sign": "Cancer",
+      "signSymbol": "♋",
+      "degree": 3,
+      "minute": 58,
+      "second": 29
+    },
+    "moonSign": "Sagittarius",
+    "sunSign": "Taurus",
+    "risingSign": "Cancer",
+    "chartType": "D1_Rasi",
+    "ayanamsa": "Lahiri",
+    "timestamp": "2025-10-25T09:48:50.085Z",
+    "source": "prokerala",
+    "prokerala": {
+      "planetPositionRaw": {
+        "planet_position": [
+          {
+            "id": 0,
+            "name": "Sun",
+            "longitude": 30.25169544075829,
+            "is_retrograde": false,
+            "position": 2,
+            "degree": 0.2516954407582901,
+            "rasi": {
+              "id": 1,
+              "name": "Vrishabha",
+              "lord": {
+                "id": 3,
+                "name": "Venus",
+                "vedic_name": "Shukra"
+              }
+            }
+          },
+          {
+            "id": 1,
+            "name": "Moon",
+            "longitude": 268.0556389587258,
+            "is_retrograde": false,
+            "position": 9,
+            "degree": 28.055638958725808,
+            "rasi": {
+              "id": 8,
+              "name": "Dhanu",
+              "lord": {
+                "id": 5,
+                "name": "Jupiter",
+                "vedic_name": "Guru"
+              }
+            }
+          },
+          {
+            "id": 2,
+            "name": "Mercury",
+            "longitude": 14.349734329234224,
+            "is_retrograde": true,
+            "position": 1,
+            "degree": 14.349734329234224,
+            "rasi": {
+              "id": 0,
+              "name": "Mesha",
+              "lord": {
+                "id": 4,
+                "name": "Mars",
+                "vedic_name": "Kuja"
+              }
+            }
+          },
+          {
+            "id": 3,
+            "name": "Venus",
+            "longitude": 348.59690600554217,
+            "is_retrograde": false,
+            "position": 12,
+            "degree": 18.596906005542166,
+            "rasi": {
+              "id": 11,
+              "name": "Meena",
+              "lord": {
+                "id": 5,
+                "name": "Jupiter",
+                "vedic_name": "Guru"
+              }
+            }
+          },
+          {
+            "id": 4,
+            "name": "Mars",
+            "longitude": 324.28634262127827,
+            "is_retrograde": false,
+            "position": 11,
+            "degree": 24.286342621278266,
+            "rasi": {
+              "id": 10,
+              "name": "Kumbha",
+              "lord": {
+                "id": 6,
+                "name": "Saturn",
+                "vedic_name": "Shani"
+              }
+            }
+          },
+          {
+            "id": 5,
+            "name": "Jupiter",
+            "longitude": 75.73656038204057,
+            "is_retrograde": false,
+            "position": 3,
+            "degree": 15.736560382040565,
+            "rasi": {
+              "id": 2,
+              "name": "Mithuna",
+              "lord": {
+                "id": 2,
+                "name": "Mercury",
+                "vedic_name": "Budha"
+              }
+            }
+          },
+          {
+            "id": 6,
+            "name": "Saturn",
+            "longitude": 271.5341187838446,
+            "is_retrograde": true,
+            "position": 10,
+            "degree": 1.5341187838445762,
+            "rasi": {
+              "id": 9,
+              "name": "Makara",
+              "lord": {
+                "id": 6,
+                "name": "Saturn",
+                "vedic_name": "Shani"
+              }
+            }
+          },
+          {
+            "id": 101,
+            "name": "Rahu",
+            "longitude": 287.63977268669345,
+            "is_retrograde": true,
+            "position": 10,
+            "degree": 17.639772686693448,
+            "rasi": {
+              "id": 9,
+              "name": "Makara",
+              "lord": {
+                "id": 6,
+                "name": "Saturn",
+                "vedic_name": "Shani"
+              }
+            }
+          },
+          {
+            "id": 102,
+            "name": "Ketu",
+            "longitude": 107.63977268669345,
+            "is_retrograde": true,
+            "position": 4,
+            "degree": 17.639772686693448,
+            "rasi": {
+              "id": 3,
+              "name": "Karka",
+              "lord": {
+                "id": 1,
+                "name": "Moon",
+                "vedic_name": "Chandra"
+              }
+            }
+          },
+          {
+            "id": 100,
+            "name": "Ascendant",
+            "longitude": 93.97458711671476,
+            "is_retrograde": false,
+            "position": 4,
+            "degree": 3.9745871167147584,
+            "rasi": {
+              "id": 3,
+              "name": "Karka",
+              "lord": {
+                "id": 1,
+                "name": "Moon",
+                "vedic_name": "Chandra"
+              }
+            }
+          }
+        ]
+      },
+      "kundli": {
+        "nakshatra_details": {
+          "nakshatra": {
+            "id": 20,
+            "name": "Uttara Ashadha",
+            "lord": {
+              "id": 0,
+              "name": "Sun",
+              "vedic_name": "Ravi"
+            },
+            "pada": 1
+          },
+          "chandra_rasi": {
+            "id": 8,
+            "name": "Dhanu",
+            "lord": {
+              "id": 5,
+              "name": "Jupiter",
+              "vedic_name": "Guru"
+            }
+          },
+          "soorya_rasi": {
+            "id": 1,
+            "name": "Vrishabha",
+            "lord": {
+              "id": 3,
+              "name": "Venus",
+              "vedic_name": "Shukra"
+            }
+          },
+          "zodiac": {
+            "id": 1,
+            "name": "Taurus"
+          },
+          "additional_info": {
+            "deity": "Vishwedeva",
+            "ganam": "Manushya",
+            "symbol": "Planks Of A Bed, Elephant's tusk",
+            "animal_sign": "Mongoose",
+            "nadi": "Kapha",
+            "color": "Copper",
+            "best_direction": "South",
+            "syllables": "Bhe, Bho, Ja, Ji",
+            "birth_stone": "Ruby",
+            "gender": "Male",
+            "planet": "Ravi",
+            "enemy_yoni": "Snake"
+          }
+        },
+        "mangal_dosha": {
+          "has_dosha": true,
+          "description": "The person is Manglik. Mars is positioned in the 8th house, it is strong Manglik Dosha"
+        },
+        "yoga_details": [
+          {
+            "name": "Major Yogas",
+            "description": "Your kundli has 4 major yogas"
+          },
+          {
+            "name": "Chandra Yogas",
+            "description": "Your kundli has 1 chandra yogas."
+          },
+          {
+            "name": "Soorya Yogas",
+            "description": "Your kundli has 3 soorya yogas."
+          },
+          {
+            "name": "Inauspicious Yogas",
+            "description": "Your kundli has 1 inauspicious yogas."
+          }
+        ]
+      }
+    }
+  },
+  "timestamp": "2025-10-25T09:48:50.085Z"
+}

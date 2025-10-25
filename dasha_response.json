@@ -1,0 +1,95 @@
+{
+  "success": true,
+  "data": {
+    "birthInfo": {
+      "name": "Test",
+      "date": "1993-11-20",
+      "time": "19:55",
+      "city": "Beijing",
+      "latitude": 39.9042,
+      "longitude": 116.4074,
+      "timezone": "Asia/Shanghai"
+    },
+    "currentDasha": {
+      "planet": "Saturn",
+      "startDate": "1993-01-01",
+      "endDate": "1999-01-01",
+      "remainingYears": 5,
+      "remainingMonths": 0,
+      "remainingDays": 0
+    },
+    "nextDasha": {
+      "planet": "Mercury",
+      "startDate": "1999-01-01",
+      "endDate": "2005-01-01",
+      "duration": 6
+    },
+    "allPeriods": [
+      {
+        "planet": "Sun",
+        "startDate": "1993-01-01",
+        "endDate": "1999-01-01",
+        "duration": 6,
+        "level": "Mahā"
+      },
+      {
+        "planet": "Moon",
+        "startDate": "1999-01-01",
+        "endDate": "2005-01-01",
+        "duration": 6,
+        "level": "Mahā"
+      },
+      {
+        "planet": "Mars",
+        "startDate": "2005-01-01",
+        "endDate": "2011-01-01",
+        "duration": 6,
+        "level": "Mahā"
+      },
+      {
+        "planet": "Rahu",
+        "startDate": "2011-01-01",
+        "endDate": "2017-01-01",
+        "duration": 6,
+        "level": "Mahā"
+      },
+      {
+        "planet": "Jupiter",
+        "startDate": "2017-01-01",
+        "endDate": "2023-01-01",
+        "duration": 6,
+        "level": "Mahā"
+      },
+      {
+        "planet": "Saturn",
+        "startDate": "2023-01-01",
+        "endDate": "2029-01-01",
+        "duration": 6,
+        "level": "Mahā"
+      },
+      {
+        "planet": "Mercury",
+        "startDate": "2029-01-01",
+        "endDate": "2035-01-01",
+        "duration": 6,
+        "level": "Mahā"
+      },
+      {
+        "planet": "Ketu",
+        "startDate": "2035-01-01",
+        "endDate": "2041-01-01",
+        "duration": 6,
+        "level": "Mahā"
+      },
+      {
+        "planet": "Venus",
+        "startDate": "2041-01-01",
+        "endDate": "2047-01-01",
+        "duration": 6,
+        "level": "Mahā"
+      }
+    ],
+    "timestamp": "2025-10-25T10:50:02.581Z"
+  },
+  "timestamp": "2025-10-25T10:50:02.581Z"
+}

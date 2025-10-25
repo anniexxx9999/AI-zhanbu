@@ -1,0 +1,465 @@
+{
+  "success": true,
+  "data": {
+    "birthInfo": {
+      "name": "Test",
+      "date": "1993-11-20",
+      "time": "19:55",
+      "city": "Beijing",
+      "latitude": 39.9042,
+      "longitude": 116.4074,
+      "timezone": "Asia/Shanghai"
+    },
+    "planets": [
+      {
+        "name": "Sun",
+        "symbol": "☉",
+        "longitude": 49.5,
+        "latitude": 0,
+        "house": 2,
+        "sign": "Scorpio",
+        "signSymbol": "♈",
+        "degree": 15,
+        "minute": 30,
+        "second": 0,
+        "retrograde": false,
+        "speed": 1
+      },
+      {
+        "name": "Moon",
+        "symbol": "☽",
+        "longitude": 4.5,
+        "latitude": 0,
+        "house": 1,
+        "sign": "Cancer",
+        "signSymbol": "♋",
+        "degree": 0,
+        "minute": 30,
+        "second": 0,
+        "retrograde": false,
+        "speed": 13
+      },
+      {
+        "name": "Mars",
+        "symbol": "♂",
+        "longitude": 4.5,
+        "latitude": 0,
+        "house": 1,
+        "sign": "Libra",
+        "signSymbol": "♎",
+        "degree": 20,
+        "minute": 30,
+        "second": 0,
+        "retrograde": false,
+        "speed": 0.5
+      },
+      {
+        "name": "Mercury",
+        "symbol": "☿",
+        "longitude": 184.5,
+        "latitude": 0,
+        "house": 7,
+        "sign": "Taurus",
+        "signSymbol": "♉",
+        "degree": 0,
+        "minute": 30,
+        "second": 0,
+        "retrograde": false,
+        "speed": 1.2
+      },
+      {
+        "name": "Jupiter",
+        "symbol": "♃",
+        "longitude": 184.5,
+        "latitude": 0,
+        "house": 7,
+        "sign": "Capricorn",
+        "signSymbol": "♑",
+        "degree": 10,
+        "minute": 30,
+        "second": 0,
+        "retrograde": false,
+        "speed": 0.1
+      },
+      {
+        "name": "Venus",
+        "symbol": "♀",
+        "longitude": 4.5,
+        "latitude": 0,
+        "house": 1,
+        "sign": "Gemini",
+        "signSymbol": "♊",
+        "degree": 20,
+        "minute": 30,
+        "second": 0,
+        "retrograde": false,
+        "speed": 1.2
+      },
+      {
+        "name": "Saturn",
+        "symbol": "♄",
+        "longitude": 94.5,
+        "latitude": 0,
+        "house": 4,
+        "sign": "Sagittarius",
+        "signSymbol": "♐",
+        "degree": 5,
+        "minute": 30,
+        "second": 0,
+        "retrograde": true,
+        "speed": 0.05
+      },
+      {
+        "name": "Rahu",
+        "symbol": "☊",
+        "longitude": 184.5,
+        "latitude": 0,
+        "house": 7,
+        "sign": "Virgo",
+        "signSymbol": "♍",
+        "degree": 15,
+        "minute": 30,
+        "second": 0,
+        "retrograde": true,
+        "speed": 0.05
+      },
+      {
+        "name": "Ketu",
+        "symbol": "☋",
+        "longitude": 4.5,
+        "latitude": 0,
+        "house": 1,
+        "sign": "Pisces",
+        "signSymbol": "♓",
+        "degree": 15,
+        "minute": 30,
+        "second": 0,
+        "retrograde": true,
+        "speed": 0.05
+      }
+    ],
+    "houses": [
+      {
+        "number": 1,
+        "name": "第1宫",
+        "nameEn": "House 1",
+        "sanskrit": "Bhava 1",
+        "sign": "Aries",
+        "signSymbol": "♈",
+        "lord": "Sun",
+        "lordPlacement": "第1宫",
+        "lordStrength": "Strong",
+        "planets": [
+          {
+            "name": "Sun",
+            "symbol": "☉",
+            "longitude": 45.5,
+            "latitude": 0,
+            "house": 1,
+            "sign": "Scorpio",
+            "signSymbol": "♈",
+            "degree": 15,
+            "minute": 30,
+            "second": 0,
+            "retrograde": false,
+            "speed": 1
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "name": "第2宫",
+        "nameEn": "House 2",
+        "sanskrit": "Bhava 2",
+        "sign": "Taurus",
+        "signSymbol": "♉",
+        "lord": "Sun",
+        "lordPlacement": "第1宫",
+        "lordStrength": "Strong",
+        "planets": [
+          {
+            "name": "Mercury",
+            "symbol": "☿",
+            "longitude": 60.5,
+            "latitude": 0,
+            "house": 2,
+            "sign": "Taurus",
+            "signSymbol": "♉",
+            "degree": 0,
+            "minute": 30,
+            "second": 0,
+            "retrograde": false,
+            "speed": 1.2
+          }
+        ]
+      },
+      {
+        "number": 3,
+        "name": "第3宫",
+        "nameEn": "House 3",
+        "sanskrit": "Bhava 3",
+        "sign": "Gemini",
+        "signSymbol": "♊",
+        "lord": "Sun",
+        "lordPlacement": "第1宫",
+        "lordStrength": "Strong",
+        "planets": [
+          {
+            "name": "Venus",
+            "symbol": "♀",
+            "longitude": 80.5,
+            "latitude": 0,
+            "house": 3,
+            "sign": "Gemini",
+            "signSymbol": "♊",
+            "degree": 20,
+            "minute": 30,
+            "second": 0,
+            "retrograde": false,
+            "speed": 1.2
+          }
+        ]
+      },
+      {
+        "number": 4,
+        "name": "第4宫",
+        "nameEn": "House 4",
+        "sanskrit": "Bhava 4",
+        "sign": "Cancer",
+        "signSymbol": "♋",
+        "lord": "Sun",
+        "lordPlacement": "第1宫",
+        "lordStrength": "Strong",
+        "planets": [
+          {
+            "name": "Moon",
+            "symbol": "☽",
+            "longitude": 120.5,
+            "latitude": 0,
+            "house": 4,
+            "sign": "Cancer",
+            "signSymbol": "♋",
+            "degree": 0,
+            "minute": 30,
+            "second": 0,
+            "retrograde": false,
+            "speed": 13
+          }
+        ]
+      },
+      {
+        "number": 5,
+        "name": "第5宫",
+        "nameEn": "House 5",
+        "sanskrit": "Bhava 5",
+        "sign": "Leo",
+        "signSymbol": "♌",
+        "lord": "Sun",
+        "lordPlacement": "第1宫",
+        "lordStrength": "Strong",
+        "planets": []
+      },
+      {
+        "number": 6,
+        "name": "第6宫",
+        "nameEn": "House 6",
+        "sanskrit": "Bhava 6",
+        "sign": "Virgo",
+        "signSymbol": "♍",
+        "lord": "Sun",
+        "lordPlacement": "第1宫",
+        "lordStrength": "Strong",
+        "planets": [
+          {
+            "name": "Rahu",
+            "symbol": "☊",
+            "longitude": 180.5,
+            "latitude": 0,
+            "house": 6,
+            "sign": "Virgo",
+            "signSymbol": "♍",
+            "degree": 15,
+            "minute": 30,
+            "second": 0,
+            "retrograde": true,
+            "speed": 0.05
+          }
+        ]
+      },
+      {
+        "number": 7,
+        "name": "第7宫",
+        "nameEn": "House 7",
+        "sanskrit": "Bhava 7",
+        "sign": "Libra",
+        "signSymbol": "♎",
+        "lord": "Sun",
+        "lordPlacement": "第1宫",
+        "lordStrength": "Strong",
+        "planets": [
+          {
+            "name": "Mars",
+            "symbol": "♂",
+            "longitude": 200.5,
+            "latitude": 0,
+            "house": 7,
+            "sign": "Libra",
+            "signSymbol": "♎",
+            "degree": 20,
+            "minute": 30,
+            "second": 0,
+            "retrograde": false,
+            "speed": 0.5
+          }
+        ]
+      },
+      {
+        "number": 8,
+        "name": "第8宫",
+        "nameEn": "House 8",
+        "sanskrit": "Bhava 8",
+        "sign": "Scorpio",
+        "signSymbol": "♏",
+        "lord": "Sun",
+        "lordPlacement": "第1宫",
+        "lordStrength": "Strong",
+        "planets": []
+      },
+      {
+        "number": 9,
+        "name": "第9宫",
+        "nameEn": "House 9",
+        "sanskrit": "Bhava 9",
+        "sign": "Sagittarius",
+        "signSymbol": "♐",
+        "lord": "Sun",
+        "lordPlacement": "第1宫",
+        "lordStrength": "Strong",
+        "planets": [
+          {
+            "name": "Saturn",
+            "symbol": "♄",
+            "longitude": 250.5,
+            "latitude": 0,
+            "house": 9,
+            "sign": "Sagittarius",
+            "signSymbol": "♐",
+            "degree": 5,
+            "minute": 30,
+            "second": 0,
+            "retrograde": true,
+            "speed": 0.05
+          }
+        ]
+      },
+      {
+        "number": 10,
+        "name": "第10宫",
+        "nameEn": "House 10",
+        "sanskrit": "Bhava 10",
+        "sign": "Capricorn",
+        "signSymbol": "♑",
+        "lord": "Sun",
+        "lordPlacement": "第1宫",
+        "lordStrength": "Strong",
+        "planets": [
+          {
+            "name": "Jupiter",
+            "symbol": "♃",
+            "longitude": 300.5,
+            "latitude": 0,
+            "house": 10,
+            "sign": "Capricorn",
+            "signSymbol": "♑",
+            "degree": 10,
+            "minute": 30,
+            "second": 0,
+            "retrograde": false,
+            "speed": 0.1
+          }
+        ]
+      },
+      {
+        "number": 11,
+        "name": "第11宫",
+        "nameEn": "House 11",
+        "sanskrit": "Bhava 11",
+        "sign": "Aquarius",
+        "signSymbol": "♒",
+        "lord": "Sun",
+        "lordPlacement": "第1宫",
+        "lordStrength": "Strong",
+        "planets": []
+      },
+      {
+        "number": 12,
+        "name": "第12宫",
+        "nameEn": "House 12",
+        "sanskrit": "Bhava 12",
+        "sign": "Pisces",
+        "signSymbol": "♓",
+        "lord": "Sun",
+        "lordPlacement": "第1宫",
+        "lordStrength": "Strong",
+        "planets": [
+          {
+            "name": "Ketu",
+            "symbol": "☋",
+            "longitude": 0.5,
+            "latitude": 0,
+            "house": 12,
+            "sign": "Pisces",
+            "signSymbol": "♓",
+            "degree": 15,
+            "minute": 30,
+            "second": 0,
+            "retrograde": true,
+            "speed": 0.05
+          }
+        ]
+      }
+    ],
+    "aspects": [
+      {
+        "from": "Sun",
+        "to": "Moon",
+        "type": "Trine",
+        "orb": 2.5,
+        "strength": 0.8,
+        "description": "Sun trine Moon - Emotional harmony"
+      },
+      {
+        "from": "Venus",
+        "to": "Mars",
+        "type": "Square",
+        "orb": 1.2,
+        "strength": 0.6,
+        "description": "Venus square Mars - Passionate tension"
+      },
+      {
+        "from": "Jupiter",
+        "to": "Saturn",
+        "type": "Opposition",
+        "orb": 3.1,
+        "strength": 0.7,
+        "description": "Jupiter opposition Saturn - Growth vs limitation"
+      }
+    ],
+    "lagna": 1,
+    "lagnaDetails": {
+      "longitude": 0,
+      "sign": "Aries",
+      "signSymbol": "♈",
+      "degree": 0,
+      "minute": 0,
+      "second": 0
+    },
+    "moonSign": "Cancer",
+    "sunSign": "Scorpio",
+    "risingSign": "Aries",
+    "chartType": "D9_Navamsa",
+    "ayanamsa": "Lahiri",
+    "timestamp": "2025-10-25T10:50:38.425Z"
+  },
+  "timestamp": "2025-10-25T10:50:38.425Z"
+}

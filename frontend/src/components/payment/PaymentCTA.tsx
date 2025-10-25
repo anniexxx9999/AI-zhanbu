@@ -113,12 +113,15 @@ export default function PaymentCTA({
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className="relative"
     >
-      <Card 
-        glow={variant === 'urgent' ? 'red' : variant === 'premium' ? 'gold' : 'purple'}
-        className={`relative overflow-hidden ${styles.gradient} border ${styles.border}`}
+      <div
+        className="relative overflow-hidden"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
+        <Card 
+          glow={variant === 'urgent' ? 'purple' : variant === 'premium' ? 'gold' : 'purple'}
+          className={`relative ${styles.gradient} border ${styles.border}`}
+        >
         {/* Background Effects */}
         <div className="absolute inset-0">
           <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-gradient-to-br from-white/5 to-transparent blur-2xl" />
@@ -287,7 +290,8 @@ export default function PaymentCTA({
             </>
           )}
         </AnimatePresence>
-      </Card>
-    </motion.div>
+        </Card>
+      </div>
+      </motion.div>
   );
 }

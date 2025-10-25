@@ -1,0 +1,248 @@
+{
+  "planetPositionRaw": {
+    "planet_position": [
+      {
+        "id": 0,
+        "name": "Sun",
+        "longitude": 214.4104299637804,
+        "is_retrograde": false,
+        "position": 8,
+        "degree": 4.410429963780388,
+        "rasi": {
+          "id": 7,
+          "name": "Vrischika",
+          "lord": {
+            "id": 4,
+            "name": "Mars",
+            "vedic_name": "Kuja"
+          }
+        }
+      },
+      {
+        "id": 1,
+        "name": "Moon",
+        "longitude": 297.7555081510456,
+        "is_retrograde": false,
+        "position": 10,
+        "degree": 27.755508151045603,
+        "rasi": {
+          "id": 9,
+          "name": "Makara",
+          "lord": {
+            "id": 6,
+            "name": "Saturn",
+            "vedic_name": "Shani"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "name": "Mercury",
+        "longitude": 195.02217303888304,
+        "is_retrograde": false,
+        "position": 7,
+        "degree": 15.02217303888304,
+        "rasi": {
+          "id": 6,
+          "name": "Tula",
+          "lord": {
+            "id": 3,
+            "name": "Venus",
+            "vedic_name": "Shukra"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "name": "Venus",
+        "longitude": 200.52947358574605,
+        "is_retrograde": false,
+        "position": 7,
+        "degree": 20.529473585746047,
+        "rasi": {
+          "id": 6,
+          "name": "Tula",
+          "lord": {
+            "id": 3,
+            "name": "Venus",
+            "vedic_name": "Shukra"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "name": "Mars",
+        "longitude": 224.36530985421433,
+        "is_retrograde": false,
+        "position": 8,
+        "degree": 14.365309854214331,
+        "rasi": {
+          "id": 7,
+          "name": "Vrischika",
+          "lord": {
+            "id": 4,
+            "name": "Mars",
+            "vedic_name": "Kuja"
+          }
+        }
+      },
+      {
+        "id": 5,
+        "name": "Jupiter",
+        "longitude": 188.35569238780985,
+        "is_retrograde": false,
+        "position": 7,
+        "degree": 8.355692387809853,
+        "rasi": {
+          "id": 6,
+          "name": "Tula",
+          "lord": {
+            "id": 3,
+            "name": "Venus",
+            "vedic_name": "Shukra"
+          }
+        }
+      },
+      {
+        "id": 6,
+        "name": "Saturn",
+        "longitude": 300.32917637384685,
+        "is_retrograde": false,
+        "position": 11,
+        "degree": 0.32917637384684895,
+        "rasi": {
+          "id": 10,
+          "name": "Kumbha",
+          "lord": {
+            "id": 6,
+            "name": "Saturn",
+            "vedic_name": "Shani"
+          }
+        }
+      },
+      {
+        "id": 101,
+        "name": "Rahu",
+        "longitude": 219.5228026462315,
+        "is_retrograde": true,
+        "position": 8,
+        "degree": 9.522802646231497,
+        "rasi": {
+          "id": 7,
+          "name": "Vrischika",
+          "lord": {
+            "id": 4,
+            "name": "Mars",
+            "vedic_name": "Kuja"
+          }
+        }
+      },
+      {
+        "id": 102,
+        "name": "Ketu",
+        "longitude": 39.522802646231526,
+        "is_retrograde": true,
+        "position": 2,
+        "degree": 9.522802646231526,
+        "rasi": {
+          "id": 1,
+          "name": "Vrishabha",
+          "lord": {
+            "id": 3,
+            "name": "Venus",
+            "vedic_name": "Shukra"
+          }
+        }
+      },
+      {
+        "id": 100,
+        "name": "Ascendant",
+        "longitude": 80.18090118598475,
+        "is_retrograde": false,
+        "position": 3,
+        "degree": 20.18090118598475,
+        "rasi": {
+          "id": 2,
+          "name": "Mithuna",
+          "lord": {
+            "id": 2,
+            "name": "Mercury",
+            "vedic_name": "Budha"
+          }
+        }
+      }
+    ]
+  },
+  "kundli": {
+    "nakshatra_details": {
+      "nakshatra": {
+        "id": 22,
+        "name": "Dhanishta",
+        "lord": {
+          "id": 4,
+          "name": "Mars",
+          "vedic_name": "Kuja"
+        },
+        "pada": 2
+      },
+      "chandra_rasi": {
+        "id": 9,
+        "name": "Makara",
+        "lord": {
+          "id": 6,
+          "name": "Saturn",
+          "vedic_name": "Shani"
+        }
+      },
+      "soorya_rasi": {
+        "id": 7,
+        "name": "Vrischika",
+        "lord": {
+          "id": 4,
+          "name": "Mars",
+          "vedic_name": "Kuja"
+        }
+      },
+      "zodiac": {
+        "id": 7,
+        "name": "Scorpio"
+      },
+      "additional_info": {
+        "deity": "Vasus/Vasu",
+        "ganam": "Asura",
+        "symbol": "Drum Or Flute",
+        "animal_sign": "Lion",
+        "nadi": "Pitta",
+        "color": "Silver Grey",
+        "best_direction": "East",
+        "syllables": "Ga, Gi, Gu, Ge",
+        "birth_stone": "Coral",
+        "gender": "Female",
+        "planet": "Kuja",
+        "enemy_yoni": "Elephant"
+      }
+    },
+    "mangal_dosha": {
+      "has_dosha": false,
+      "description": "The person is Not Manglik"
+    },
+    "yoga_details": [
+      {
+        "name": "Major Yogas",
+        "description": "Your kundli has 5 major yogas"
+      },
+      {
+        "name": "Chandra Yogas",
+        "description": "Your kundli has 1 chandra yogas."
+      },
+      {
+        "name": "Soorya Yogas",
+        "description": "Your kundli has 1 soorya yogas."
+      },
+      {
+        "name": "Inauspicious Yogas",
+        "description": "Your kundli has 1 inauspicious yogas."
+      }
+    ]
+  }
+}

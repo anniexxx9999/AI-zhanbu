@@ -1,0 +1,120 @@
+{
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "pricing": "Pricing",
+    "language": "Language"
+  },
+  "homepage": {
+    "title": "✨ Start Your Astrology Journey",
+    "subtitle": "Hey sister! Tell me your birth information, let me reveal the secrets of the universe for you 💫",
+    "cta": "Start My Astrology Journey",
+    "features": {
+      "title": "Why Choose Us?",
+      "feature1": {
+        "title": "Professional Astrology Analysis",
+        "description": "Deep analysis based on traditional Indian astrology"
+      },
+      "feature2": {
+        "title": "AI Soulmate Portrait",
+        "description": "AI-generated portrait of your ideal soulmate"
+      },
+      "feature3": {
+        "title": "Detailed Reports",
+        "description": "Comprehensive birth chart analysis and life guidance"
+      }
+    }
+  },
+  "birthInfo": {
+    "title": "✨ Start Your Astrology Journey",
+    "subtitle": "Hey sister! Tell me your birth information, let me reveal the secrets of the universe for you 💫",
+    "form": {
+      "name": "Your Name (nickname is fine too)",
+      "date": "Date of Birth",
+      "time": "Time of Birth (the more precise the better)",
+      "city": "City of Birth",
+      "submit": "✨ Reveal My Horoscope"
+    },
+    "sampleData": {
+      "title": "Using Sample Data",
+      "description": "Click 'Enter My Information' to replace with your real birth information",
+      "button": "Enter My Information"
+    },
+    "privacy": {
+      "title": "Your Privacy Matters to Us",
+      "description": "We will only use this information to generate your exclusive horoscope, and will never share it with any third party 💕"
+    }
+  },
+  "dashboard": {
+    "title": "Your Birth Chart Analysis",
+    "loading": "Analyzing your birth chart...",
+    "error": "Analysis failed, please try again",
+    "upgrade": "Upgrade Now",
+    "sections": {
+      "overview": "Overview",
+      "planets": "Planet Positions",
+      "houses": "House Analysis",
+      "aspects": "Aspects"
+    }
+  },
+  "pricing": {
+    "title": "Choose Your Plan",
+    "subtitle": "Unlock More Astrological Insights",
+    "plans": {
+      "free": {
+        "name": "Free",
+        "price": "Free",
+        "features": [
+          "Basic birth chart analysis",
+          "Planet positions",
+          "Basic house information"
+        ]
+      },
+      "premium": {
+        "name": "Premium",
+        "price": "$15/month",
+        "features": [
+          "Complete birth chart analysis",
+          "AI soulmate portrait",
+          "Detailed reports",
+          "Professional interpretation"
+        ]
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "$45/month",
+        "features": [
+          "All premium features",
+          "One-on-one consultation",
+          "Customized reports",
+          "Lifetime support"
+        ]
+      }
+    }
+  },
+  "payment": {
+    "title": "Complete Payment",
+    "processing": "Processing...",
+    "success": "Payment Successful!",
+    "error": "Payment failed, please try again"
+  },
+  "report": {
+    "spouse": {
+      "title": "🔮 Vedic Marriage & Soulmate Analysis Report",
+      "subtitle": "Vedic Marriage & Soulmate Analysis Report",
+      "generated": "Generated on",
+      "client": "Client"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  }
+}
+

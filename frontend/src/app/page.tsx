@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/contexts/LanguageContext';
 import StarField from '@/components/particles/StarField';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -9,6 +10,7 @@ import { FiHeart, FiStar, FiTrendingUp } from 'react-icons/fi';
 
 export default function HomePage() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const testimonials = [
     {
@@ -16,48 +18,48 @@ export default function HomePage() {
       age: 28,
       avatar: '👩',
       rating: 5,
-      text: '报告里描述的配偶特质和我现在的男朋友一模一样！',
+      text: 'The spouse traits described in the report match my current boyfriend exactly!',
     },
     {
       name: 'Mia',
       age: 25,
       avatar: '👧',
       rating: 5,
-      text: 'AI的语言好温暖，让我重新认识了自己。就像有个懂我的闺蜜在跟我聊天。',
+      text: 'The AI language is so warm, it made me rediscover myself. Like having a best friend who understands me chatting with me.',
     },
     {
       name: 'Lily',
       age: 31,
       avatar: '🧑‍🦰',
       rating: 5,
-      text: '界面太美了，每次打开都像进入一个魔法世界💫',
+      text: 'The interface is so beautiful, every time I open it feels like entering a magical world💫',
     },
   ];
 
   const features = [
     {
       icon: '🌸',
-      title: '告诉我们你的出生时刻',
-      description: '精准到分钟的出生信息',
+      title: 'Tell us your birth moment',
+      description: 'Birth information accurate to the minute',
     },
     {
       icon: '✨',
-      title: '获得精准的星盘',
-      description: '基于专业计算引擎',
+      title: 'Get precise birth chart',
+      description: 'Based on professional calculation engine',
     },
     {
       icon: '💕',
-      title: 'AI温暖解读',
-      description: '像闺蜜一样理解你',
+      title: 'AI warm interpretation',
+      description: 'Like a best friend who understands you',
     },
   ];
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* 星空背景 */}
+      {/* Star field background */}
       <StarField />
 
-      {/* 主内容 */}
+      {/* Main content */}
       <div className="relative z-10">
         {/* Hero Section */}
         <section className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
@@ -79,7 +81,7 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-4xl md:text-5xl font-display mb-6 gradient-text"
           >
-            ✨ 映射你的灵魂，发现你的命运 ✨
+            {t('homepage.title')}
           </motion.h2>
 
           <motion.p
@@ -88,9 +90,7 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-lg md:text-xl text-text-secondary max-w-2xl mb-12 leading-relaxed"
           >
-            用古老的印度占星智慧 × 现代AI的温暖解读
-            <br />
-            揭示你内在的宇宙
+            {t('homepage.subtitle')}
           </motion.p>
 
           <motion.div
@@ -103,7 +103,7 @@ export default function HomePage() {
               icon="🌸"
               onClick={() => router.push('/birth-info')}
             >
-              开启我的星盘之旅
+              {t('homepage.cta')}
             </Button>
           </motion.div>
 
@@ -113,16 +113,16 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 0.8 }}
             className="mt-8 text-text-muted"
           >
-            已有 <span className="text-rose-gold font-semibold">10,247</span> 位姐妹找到了答案 💕
+            <span className="text-rose-gold font-semibold">10,247</span> sisters have found their answers 💕
           </motion.p>
 
-          {/* 向下滚动提示 */}
+          {/* Scroll down hint */}
           <motion.div
             className="absolute bottom-10"
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            <p className="text-text-muted text-sm mb-2">向下滑动探索</p>
+            <p className="text-text-muted text-sm mb-2">Scroll down to explore</p>
             <div className="w-6 h-10 border-2 border-text-muted rounded-full mx-auto flex items-start justify-center p-2">
               <motion.div
                 className="w-1.5 h-1.5 bg-text-muted rounded-full"
@@ -141,7 +141,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-4xl font-display text-center mb-16 gradient-text"
           >
-            她们这样说 AstroSoul...
+            What they say about AstroSoul...
           </motion.h3>
 
           <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">

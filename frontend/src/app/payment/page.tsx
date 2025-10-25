@@ -15,7 +15,7 @@ import {
 export default function PaymentPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [selectedPlan, setSelectedPlan] = useState(searchParams.get('plan') || 'professional');
+  const [selectedPlan, setSelectedPlan] = useState(searchParams?.get('plan') || 'professional');
   const [paymentMethod, setPaymentMethod] = useState('wechat');
   const [isProcessing, setIsProcessing] = useState(false);
   const [step, setStep] = useState(1); // 1: 选择计划, 2: 支付方式, 3: 确认支付

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/contexts/LanguageContext';
 import StarField from '@/components/particles/StarField';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -12,6 +13,7 @@ import { astrologyAPI } from '@/services/api';
 
 export default function BirthInfoPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     name: 'Asta Sharma',
     date: '1990-05-20',
@@ -39,10 +41,10 @@ export default function BirthInfoPage() {
     
     // 简单验证
     const newErrors: Record<string, string> = {};
-    if (!formData.name) newErrors.name = '请告诉我你的名字 🙈';
-    if (!formData.date) newErrors.date = '出生日期很重要哦 ✨';
-    if (!formData.time) newErrors.time = '精准到分钟会更准确呢 💫';
-    if (!formData.city) newErrors.city = '让我知道你在哪里出生的 🌸';
+    if (!formData.name) newErrors.name = 'Please tell me your name 🙈';
+    if (!formData.date) newErrors.date = 'Birth date is very important ✨';
+    if (!formData.time) newErrors.time = 'Accurate to the minute will be more precise 💫';
+    if (!formData.city) newErrors.city = 'Let me know where you were born 🌸';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -91,7 +93,7 @@ export default function BirthInfoPage() {
               transition={{ delay: 0.2 }}
               className="text-5xl font-display mb-4 gradient-text"
             >
-              ✨ 开启你的星盘之旅
+              {t('birthInfo.title')}
             </motion.h1>
             <motion.p
               initial={{ opacity: 0 }}
@@ -149,8 +151,8 @@ export default function BirthInfoPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name Input */}
               <Input
-                label="你的名字（昵称也可以哦）"
-                placeholder="比如：小雪、Xuan..."
+                label={t('birthInfo.form.name')}
+                placeholder="e.g.: Sarah, Xuan..."
                 icon={<FiUser />}
                 value={formData.name}
                 onChange={(e) => {
@@ -162,7 +164,7 @@ export default function BirthInfoPage() {
 
               {/* Date Input */}
               <Input
-                label="出生日期"
+                label={t('birthInfo.form.date')}
                 type="date"
                 icon={<FiCalendar />}
                 value={formData.date}
@@ -175,7 +177,7 @@ export default function BirthInfoPage() {
 
               {/* Time Input */}
               <Input
-                label="出生时间（越精确越好）"
+                label={t('birthInfo.form.time')}
                 type="time"
                 icon={<FiClock />}
                 value={formData.time}
@@ -188,8 +190,8 @@ export default function BirthInfoPage() {
 
               {/* City Input */}
               <Input
-                label="出生城市"
-                placeholder="比如：上海、北京、Mumbai..."
+                label={t('birthInfo.form.city')}
+                placeholder="e.g.: Shanghai, Beijing, Mumbai..."
                 icon={<FiMapPin />}
                 value={formData.city}
                 onChange={(e) => {
@@ -221,7 +223,7 @@ export default function BirthInfoPage() {
                 icon="✨"
                 disabled={submitting}
               >
-                {submitting ? '星盘生成中...' : '揭示我的命盘'}
+                {submitting ? 'Generating chart...' : t('birthInfo.form.submit')}
               </Button>
 
               {/* Back Link */}
