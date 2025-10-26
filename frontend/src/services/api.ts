@@ -25,6 +25,7 @@ const resolveDefaultBaseUrl = () => {
 
 export interface BirthInfo {
   name: string;
+  gender: string;
   date: string;
   time: string;
   city: string;

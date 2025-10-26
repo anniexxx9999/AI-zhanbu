@@ -9,9 +9,10 @@ import { generateSoulmatePrompt, generateMultiplePrompts, getAstrologicalInsight
 interface SoulmatePortraitProps {
   birthInfo?: any;
   astrologicalData?: any;
+  soulmateData?: any;
 }
 
-export default function SoulmatePortrait({ birthInfo, astrologicalData }: SoulmatePortraitProps) {
+export default function SoulmatePortrait({ birthInfo, astrologicalData, soulmateData }: SoulmatePortraitProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentImage, setCurrentImage] = useState<string | null>(null);
   const [generationPrompt, setGenerationPrompt] = useState<string>('');
@@ -59,10 +60,19 @@ export default function SoulmatePortrait({ birthInfo, astrologicalData }: Soulma
   }, [generatePrompt]);
 
   useEffect(() => {
-    if (birthInfo) {
+    // 优先使用后端生成的真实图像
+    if (soulmateData?.generation?.bestImage?.url) {
+      setCurrentImage(soulmateData.generation.bestImage.url);
+      setIsGenerating(false);
+    } else if (soulmateData?.generation?.images && soulmateData.generation.images.length > 0) {
+      // 使用第一张图像
+      setCurrentImage(soulmateData.generation.images[0].url);
+      setIsGenerating(false);
+    } else if (birthInfo && !soulmateData) {
+      // 如果没有后端数据，使用占位图
       generateImage();
     }
-  }, [birthInfo, generateImage]);
+  }, [birthInfo, soulmateData, generateImage]);
 
 
   const handleDownload = () => {

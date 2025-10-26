@@ -8,7 +8,7 @@ import StarField from '@/components/particles/StarField';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
-import { FiUser, FiCalendar, FiClock, FiMapPin } from 'react-icons/fi';
+import { FiUser, FiCalendar, FiClock, FiMapPin, FiHeart } from 'react-icons/fi';
 import { astrologyAPI } from '@/services/api';
 
 export default function BirthInfoPage() {
@@ -16,6 +16,7 @@ export default function BirthInfoPage() {
   const { t } = useLanguage();
   const [formData, setFormData] = useState({
     name: 'Asta Sharma',
+    gender: 'Female',
     date: '1990-05-20',
     time: '08:30',
     city: 'New Delhi, India',
@@ -28,6 +29,7 @@ export default function BirthInfoPage() {
   const clearDefaultData = () => {
     setFormData({
       name: '',
+      gender: 'Female',
       date: '',
       time: '',
       city: '',
@@ -161,6 +163,46 @@ export default function BirthInfoPage() {
                 }}
                 error={errors.name}
               />
+
+              {/* Gender Selection */}
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-2 flex items-center gap-2">
+                  <FiHeart className="w-4 h-4 text-pink-400" />
+                  性别
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData({ ...formData, gender: 'Female' });
+                      if (isDefaultData) setIsDefaultData(false);
+                    }}
+                    className={`px-4 py-3 rounded-xl border-2 transition-all ${
+                      formData.gender === 'Female'
+                        ? 'border-pink-400 bg-pink-500/20 text-white'
+                        : 'border-white/10 bg-white/5 text-text-muted hover:border-white/20'
+                    }`}
+                  >
+                    <span className="text-xl mb-1 block">🌸</span>
+                    <span className="font-medium">女性</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData({ ...formData, gender: 'Male' });
+                      if (isDefaultData) setIsDefaultData(false);
+                    }}
+                    className={`px-4 py-3 rounded-xl border-2 transition-all ${
+                      formData.gender === 'Male'
+                        ? 'border-blue-400 bg-blue-500/20 text-white'
+                        : 'border-white/10 bg-white/5 text-text-muted hover:border-white/20'
+                    }`}
+                  >
+                    <span className="text-xl mb-1 block">⭐</span>
+                    <span className="font-medium">男性</span>
+                  </button>
+                </div>
+              </div>
 
               {/* Date Input */}
               <Input

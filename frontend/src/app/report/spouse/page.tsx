@@ -16,21 +16,108 @@ export default function SpouseReportPage() {
   const { t } = useLanguage();
   const [birthInfo, setBirthInfo] = useState<any>(null);
   const [isTyping, setIsTyping] = useState(true);
+  const [soulmateData, setSoulmateData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem('birthInfo');
     if (stored) {
-      setBirthInfo(JSON.parse(stored));
+      const info = JSON.parse(stored);
+      setBirthInfo(info);
     }
     
     // 模拟打字机效果完成
     setTimeout(() => setIsTyping(false), 3000);
   }, []);
 
+  // 获取灵魂伴侣数据
+  useEffect(() => {
+    const fetchSoulmateData = async () => {
+      if (!birthInfo) return;
+      
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const response = await fetch('http://localhost:3001/api/astrology/soulmate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            birthInfo,
+            options: {
+              includeNavamsa: true,
+              skipReport: false,
+              skipImage: false,
+              generationOptions: {
+                generate: true,
+                provider: 'aliyun',
+                model: 'wan2.5-t2i-preview'
+              }
+            }
+          })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          setSoulmateData(data.data);
+          console.log('Soulmate data loaded:', data.data);
+        } else {
+          setError(data.error || 'Failed to fetch soulmate data');
+        }
+      } catch (err) {
+        console.error('Failed to fetch soulmate data:', err);
+        setError('Network error. Please check if backend is running on port 3001');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchSoulmateData();
+  }, [birthInfo]);
+
   const shareQuote = (quote: string) => {
     // 这里可以实现分享功能
     alert(`分享: ${quote}`);
   };
+
+  // 加载状态
+  if (loading) {
+    return (
+      <div className="relative min-h-screen overflow-hidden">
+        <StarField />
+        <div className="relative z-10 flex items-center justify-center min-h-screen">
+          <Card glow="purple">
+            <div className="text-center">
+              <div className="animate-spin text-6xl mb-4">✨</div>
+              <p className="text-xl text-purple-300">正在生成您的灵魂伴侣报告...</p>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // 错误状态
+  if (error) {
+    return (
+      <div className="relative min-h-screen overflow-hidden">
+        <StarField />
+        <div className="relative z-10">
+          <Navigation />
+          <div className="max-w-5xl mx-auto px-6 py-12">
+                          <Card>
+              <div className="text-center">
+                <h2 className="text-2xl font-display text-red-400 mb-4">❌ 加载失败</h2>
+                <p className="text-red-300 mb-6">{error}</p>
+                <Button onClick={() => window.location.reload()}>重新加载</Button>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -69,7 +156,7 @@ export default function SpouseReportPage() {
             
             {/* AI Soulmate Portrait */}
             <div className="max-w-md mx-auto mb-12">
-              <SoulmatePortrait birthInfo={birthInfo} />
+              <SoulmatePortrait birthInfo={birthInfo} soulmateData={soulmateData} />
             </div>
           </motion.div>
 
@@ -109,7 +196,9 @@ export default function SpouseReportPage() {
                 <div className="text-center">
                   <div className="text-4xl mb-3">♊</div>
                   <h3 className="text-xl font-semibold mb-2">{t('report.spouse.risingSign')}</h3>
-                  <p className="text-lg text-purple-300">Mithuna (双子座)</p>
+                  <p className="text-lg text-purple-300">
+                    {soulmateData?.analysis?.charts?.d1?.risingSign || 'Unknown'}
+                  </p>
                   <p className="text-sm text-purple-400">聪慧、善于沟通</p>
                 </div>
               </Card>
@@ -118,7 +207,9 @@ export default function SpouseReportPage() {
                 <div className="text-center">
                   <div className="text-4xl mb-3">🌙</div>
                   <h3 className="text-xl font-semibold mb-2">{t('report.spouse.moonSign')}</h3>
-                  <p className="text-lg text-blue-300">Makara (摩羯座)</p>
+                  <p className="text-lg text-blue-300">
+                    {soulmateData?.analysis?.charts?.d1?.moonSign || 'Unknown'}
+                  </p>
                   <p className="text-sm text-blue-400">坚韧、务实、负责</p>
                 </div>
               </Card>
@@ -127,7 +218,9 @@ export default function SpouseReportPage() {
                 <div className="text-center">
                   <div className="text-4xl mb-3">☉</div>
                   <h3 className="text-xl font-semibold mb-2">{t('report.spouse.sunSign')}</h3>
-                  <p className="text-lg text-red-300">Vrishchika (天蝎座)</p>
+                  <p className="text-lg text-red-300">
+                    {soulmateData?.analysis?.charts?.d1?.sunSign || 'Unknown'}
+                  </p>
                   <p className="text-sm text-red-400">深邃、有力、转化</p>
                 </div>
               </Card>
@@ -154,12 +247,15 @@ export default function SpouseReportPage() {
                 </h3>
                 <div className="space-y-4">
                   <p className="text-purple-300 leading-relaxed">
-                    您的第七宫（位于射手座）内无行星落入，这使得宫主星的状态成为分析的绝对核心。
+                    您的第七宫（位于{soulmateData?.analysis?.seventhHouse?.sign || '射手座'}）内无行星落入，这使得宫主星的状态成为分析的绝对核心。
                   </p>
                   <div className="bg-purple-900/30 rounded-lg p-4 border border-purple-500/30">
                     <h4 className="text-lg font-semibold text-pink-300 mb-2">宫主星状态</h4>
                     <p className="text-purple-200">
-                      您的第七宫主星为 Guru (木星)。木星飞入了代表智慧、恋爱与前世福报的第五宫，
+                      您的第七宫主星为 {soulmateData?.analysis?.seventhLord?.planet || 'Guru (木星)'}。
+                      {soulmateData?.analysis?.seventhLord?.d1Placement?.house && 
+                        `飞入了代表智慧、恋爱与前世福报的第${soulmateData.analysis.seventhLord.d1Placement.house}宫。`
+                      }
                       与代表您自身的命主星水星和代表爱情的天然指示星金星形成紧密合相。这是一个顶级的格局。
                     </p>
                   </div>
