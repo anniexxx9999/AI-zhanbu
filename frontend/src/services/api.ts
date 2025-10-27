@@ -30,7 +30,8 @@ export interface BirthInfo {
   city: string;
   latitude?: number;
   longitude?: number;
-  timezone?: string;
+  timezone?: number | string;
+  seconds?: number;
 }
 
 export interface ApiResponse<T> {
@@ -41,19 +42,33 @@ export interface ApiResponse<T> {
   message?: string;
 }
 
+export interface NakshatraInfo {
+  number?: number | null;
+  name?: string | null;
+  pada?: number | null;
+  vimsottariLord?: string | null;
+}
+
 export interface PlanetPosition {
   name: string;
   symbol: string;
   longitude: number;
+  fullDegree?: number;
+  normDegree?: number;
   latitude: number;
   house: number;
   sign: string;
   signSymbol: string;
+  zodiacSignName?: string;
+  zodiacSignLord?: string;
   degree: number;
   minute: number;
   second: number;
   retrograde: boolean;
   speed: number;
+  localizedName?: string | null;
+  nakshatra?: NakshatraInfo | null;
+  raw?: Record<string, unknown> | null;
 }
 
 export interface House {
@@ -98,6 +113,20 @@ export interface ChartData {
   chartType?: string;
   ayanamsa?: string;
   timestamp: string;
+  apiData?: {
+    chart?: unknown;
+    navamsa?: unknown;
+  };
+}
+
+export interface AnalysisData {
+  analysis: string;
+  chartData: ChartData;
+  metadata: {
+    generatedAt: string;
+    source: string;
+    prompt: string;
+  };
 }
 
 class ApiClient {
@@ -126,6 +155,10 @@ class ApiClient {
     const sanitizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
     const url = `${baseURL}${sanitizedEndpoint}`;
 
+    // Create an AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 seconds timeout
+
     const defaultOptions: RequestInit = {
       method: 'GET',
       headers: {
@@ -134,6 +167,7 @@ class ApiClient {
       },
       mode: 'cors',
       cache: 'no-store',
+      signal: controller.signal,
     };
 
     const requestOptions = { ...defaultOptions, ...options };
@@ -146,13 +180,22 @@ class ApiClient {
       );
     }
 
-    const response = await fetch(url, requestOptions);
+    try {
+      const response = await fetch(url, requestOptions);
+      clearTimeout(timeoutId);
 
-    if (!response.ok) {
-      throw new Error(`Request failed with status ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('请求超时，请稍后重试');
+      }
+      throw error;
     }
-
-    return response.json();
   }
 
   async calculateChart(birthInfo: BirthInfo): Promise<ApiResponse<ChartData>> {
@@ -161,12 +204,20 @@ class ApiClient {
       body: JSON.stringify(birthInfo),
     });
   }
+
+  async generateAnalysis(birthInfo: BirthInfo, prompt: string): Promise<ApiResponse<AnalysisData>> {
+    return this.request('/chart-analysis', {
+      method: 'POST',
+      body: JSON.stringify({ birthInfo, prompt }),
+    });
+  }
 }
 
 export const apiClient = new ApiClient(process.env.NEXT_PUBLIC_API_URL);
 
 export const astrologyAPI = {
   calculateChart: (birthInfo: BirthInfo) => apiClient.calculateChart(birthInfo),
+  generateAnalysis: (birthInfo: BirthInfo, prompt: string) => apiClient.generateAnalysis(birthInfo, prompt),
 };
 
 export default astrologyAPI;

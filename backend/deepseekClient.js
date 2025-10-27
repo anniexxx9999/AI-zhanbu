@@ -1,0 +1,451 @@
+const { OpenAI } = require('openai');
+
+class DeepSeekClient {
+  constructor(apiKey) {
+    this.client = new OpenAI({
+      apiKey: apiKey,
+      baseURL: 'https://api.deepseek.com',
+    });
+  }
+
+  /**
+   * 生成星座个性描述
+   */
+  async generateSignDescription(signType, sign, context) {
+    const prompt = this.getSignDescriptionPrompt(signType, sign, context);
+    
+    try {
+      const response = await this.client.chat.completions.create({
+        model: 'deepseek-chat',
+        messages: [
+          {
+            role: 'system',
+            content: '你是一位专业的占星师，擅长用温暖而深刻的方式描述星座特征。'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 500
+      });
+
+      return this.parseDescription(response.choices[0].message.content);
+    } catch (error) {
+      console.error('DeepSeek API error:', error);
+      return this.getFallbackDescription(signType, sign);
+    }
+  }
+
+  /**
+   * 分析行星强弱
+   */
+  async analyzePlanetStrength(planets, houses, aspects) {
+    const prompt = this.getPlanetStrengthPrompt(planets, houses, aspects);
+    
+    try {
+      const response = await this.client.chat.completions.create({
+        model: 'deepseek-chat',
+        messages: [
+          {
+            role: 'system',
+            content: '你是一位印度占星学专家，擅长分析行星力量。'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.5,
+        max_tokens: 1000
+      });
+
+      return this.parsePlanetStrength(response.choices[0].message.content);
+    } catch (error) {
+      console.error('DeepSeek API error:', error);
+      return this.getFallbackPlanetStrength(planets);
+    }
+  }
+
+  /**
+   * 生成个性化建议
+   */
+  async generatePersonalizedAdvice(chartData) {
+    const prompt = this.getAdvicePrompt(chartData);
+    
+    try {
+      const response = await this.client.chat.completions.create({
+        model: 'deepseek-chat',
+        messages: [
+          {
+            role: 'system',
+            content: '你是一位心灵导师，擅长根据占星数据提供个性化建议。'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 800
+      });
+
+      return this.parseAdvice(response.choices[0].message.content);
+    } catch (error) {
+      console.error('DeepSeek API error:', error);
+      return this.getFallbackAdvice(chartData);
+    }
+  }
+
+  /**
+   * 生成灵魂伴侣描述
+   */
+  async generateSoulmateDescription(birthInfo, chartData) {
+    const prompt = this.getSoulmatePrompt(birthInfo, chartData);
+    
+    try {
+      const response = await this.client.chat.completions.create({
+        model: 'deepseek-chat',
+        messages: [
+          {
+            role: 'system',
+            content: '你是一位浪漫的爱情占星师，擅长描述理想伴侣特征。'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.8,
+        max_tokens: 600
+      });
+
+      return this.parseSoulmateDescription(response.choices[0].message.content);
+    } catch (error) {
+      console.error('DeepSeek API error:', error);
+      return this.getFallbackSoulmate();
+    }
+  }
+
+  // Prompt 生成方法
+  getSignDescriptionPrompt(signType, sign, context) {
+    const typeMap = {
+      lagna: { role: '上升点', desc: '你给人的第一印象' },
+      moon: { role: '月亮星座', desc: '你内心深处真正的需求' },
+      sun: { role: '太阳星座', desc: '驱动你前进的动力' }
+    };
+
+    const { role, desc } = typeMap[signType] || {};
+    
+    return `请为${role}在${sign}星座的人写一段占星描述。
+
+描述应该包括：
+1. ${desc}是什么
+2. 为什么会有这样的特征
+3. 如何在生活中体现
+
+要求：
+- 温暖而专业
+- 150字以内
+- 用"你"而不是"他/她"
+- 包含一个具体的行动建议
+
+格式：返回JSON格式
+{
+  "mask/need/fuel": "开头的一句话...",
+  "desc": "详细的描述..."
+}`;
+  }
+
+  getPlanetStrengthPrompt(planets, houses, aspects) {
+    return `基于以下占星数据，分析行星的力量强弱：
+
+行星位置：
+${planets.map(p => `- ${p.name} 在第${p.house}宫，${p.sign}`).join('\n')}\n') || '无数据';
+
+宫位信息：
+${houses.map(h => `- 第${h.number}宫: ${h.name}(${h.sign})`).join('\n')}\n') || '无数据';
+
+请分析：
+1. 哪些行星最强（前3名）及原因
+2. 哪个行星最弱及原因
+3. 给出改进建议
+
+格式：返回JSON格式
+{
+  "strongest": [
+    {"planet": "行星名", "power": "能力描述", "score": 90, "desc": "解释"}
+  ],
+  "weakest": {"planet": "行星名", "lesson": "课题", "score": 45, "desc": "解释"}
+}`;
+  }
+
+  getAdvicePrompt(chartData) {
+    return `基于占星数据，生成个性化建议：
+
+上升星座：${chartData.risingSign}
+太阳星座：${chartData.sunSign}
+月亮星座：${chartData.moonSign}
+
+请提供：
+1. 幸运颜色（3个）
+2. 推荐宝石
+3. 个人咒语
+4. 推荐活动（3个）
+5. 幸运日
+6. 主元素
+
+格式：返回JSON格式
+{
+  "colors": ["颜色1", "颜色2", "颜色3"],
+  "gem": "宝石名称",
+  "gemPlanet": "对应的行星",
+  "mantra": "咒语",
+  "activities": ["活动1", "活动2", "活动3"],
+  "luckyDay": "周几",
+  "element": "元素"
+}`;
+  }
+
+  getSoulmatePrompt(birthInfo, chartData) {
+    return `为一个出生在${birthInfo.date} ${birthInfo.time}的人生成理想灵魂伴侣的描述。
+
+占星特征：
+- 上升星座：${chartData.risingSign}
+- 太阳星座：${chartData.sunSign}
+- 月亮星座：${chartData.moonSign}
+
+请描述：
+1. 理想伴侣的性格特征
+2. 你们的关系会是怎样的
+3. 在哪里容易遇到
+
+要求：浪漫而具体，200字以内
+
+格式：返回JSON格式
+{
+  "description": "整体描述",
+  "traits": ["特征1", "特征2", "特征3"],
+  "relationship": "关系描述",
+  "whereToMeet": "相遇地点"
+}`;
+  }
+
+  // 解析方法
+  parseDescription(content) {
+    try {
+      const json = JSON.parse(content);
+      return json;
+    } catch (e) {
+      // 如果解析失败，返回占位符
+      return { mask: "—", desc: "—" };
+    }
+  }
+
+  parsePlanetStrength(content) {
+    try {
+      const json = JSON.parse(content);
+      return json;
+    } catch (e) {
+      return { strongest: [], weakest: { planet: "—", lesson: "—", score: 0, desc: "—" } };
+    }
+  }
+
+  parseAdvice(content) {
+    try {
+      const json = JSON.parse(content);
+      return json;
+    } catch (e) {
+      return { colors: [], gem: "—", gemPlanet: "—", mantra: "—", activities: [], luckyDay: "—", element: "—" };
+    }
+  }
+
+  parseSoulmateDescription(content) {
+    try {
+      const json = JSON.parse(content);
+      return json;
+    } catch (e) {
+      return { description: "—", traits: [], relationship: "—", whereToMeet: "—" };
+    }
+  }
+
+  // Fallback 方法
+  getFallbackDescription(signType, sign) {
+    return {
+      mask: "—",
+      desc: `基于${sign}星座的个性特点...`
+    };
+  }
+
+  getFallbackPlanetStrength(planets) {
+    return {
+      strongest: [],
+      weakest: { planet: "—", lesson: "—", score: 0, desc: "—" }
+    };
+  }
+
+  getFallbackAdvice(chartData) {
+    return {
+      colors: ["—", "—", "—"],
+      gem: "—",
+      gemPlanet: "—",
+      mantra: "—",
+      activities: ["—", "—", "—"],
+      luckyDay: "—",
+      element: "—"
+    };
+  }
+
+  getFallbackSoulmate() {
+    return {
+      description: "—",
+      traits: ["—", "—", "—"],
+      relationship: "—",
+      whereToMeet: "—"
+    };
+  }
+
+
+  /**
+   * 根据自定义提示词生成命盘分析报告
+   */
+  async generateChartAnalysisReport(prompt, chartData) {
+    const fullPrompt = this.buildAnalysisPrompt(prompt, chartData);
+    
+    try {
+      const response = await this.client.chat.completions.create({
+        model: 'deepseek-chat',
+        messages: [
+          {
+            role: 'system',
+            content: '你是一位资深的印度占星学大师，擅长深度解读星盘。你的分析要专业、准确、有洞察力。'
+          },
+          {
+            role: 'user',
+            content: fullPrompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 2000
+      });
+
+      return response.choices[0].message.content;
+    } catch (error) {
+      console.error('DeepSeek API error:', error);
+      return '抱歉，生成报告时出现问题。';
+    }
+  }
+
+  /**
+   * 构建完整的分析提示词
+   */
+  buildAnalysisPrompt(userPrompt, chartData) {
+    // Build planet positions string
+    const planetPositions = chartData.planets?.map(p => {
+      let status = '';
+      if (p.retrograde) status += ' R';
+      return `${p.name || '未知'} (${p.sign} ${p.signSymbol || ''}): 第${p.house}宫${status}`;
+    }).join('\n') || '无数据';
+
+    // Build house information
+    const houseInfo = chartData.houses?.map(h => {
+      return `- 第${h.number}宫(${h.name}, Bhava): ${h.sign} ${h.signSymbol || ''}, 宫主星(Lord) ${h.lord || '未知'}`;
+    }).join('\n') || '无数据';
+
+    // Build nakshatra info
+    const moon = chartData.planets?.find(p => p.name === 'Moon' || p.name === '月亮');
+    const moonNakshatra = moon?.nakshatra ? `${moon.nakshatra.name} 第${moon.nakshatra.pada} pada` : '未知';
+
+    return `【角色设定】
+你现在是一位顶级的印度吠陀占星大师(Jyotish Guru)。你的分析必须：
+
+1. **专业严谨**: 基于行星(Graha)、星座(Rasi)、宫位(Bhava)、相位(Drishti)、星宿(Nakshatra)等核心原则，使用正确的中文术语并在首次出现时解释英文原词。
+
+2. **客观全面**: 全面评估星盘的优势与挑战，避免极端、宿命论的语言。目的是揭示潜能和需要注意的领域。
+
+3. **结构清晰**: 先总体概述，再分领域深入探讨。使用标题、子标题组织内容。
+
+4. **深刻洞察**: 不仅罗列配置，更要综合解读行星间的相互作用。
+
+5. **建设赋能**: 在指出挑战时提供吠陀传统的改善建议(Upayas)，如宝石、咒语、慈善行为。强调个人自由意志。
+
+【命盘数据】
+
+出生信息:
+- 姓名: ${chartData.birthInfo?.name || '未知'}
+- 出生日期: ${chartData.birthInfo?.date || '未知'}
+- 出生时间: ${chartData.birthInfo?.time || '未知'}
+- 出生地点: ${chartData.birthInfo?.city || '未知'}
+
+核心参数:
+- **上升点(Lagna)**: ${chartData.risingSign || '未知'} ${chartData.lagnaDetails?.signSymbol || ''}
+- **月亮(Chandra)**: ${chartData.moonSign || '未知'}, 星宿: ${moonNakshatra}
+- **太阳(Surya)**: ${chartData.sunSign || '未知'}
+
+行星位置(D1 Rasi Chart):
+${planetPositions}
+
+宫位信息:
+${houseInfo}
+
+相位信息:
+${chartData.aspects?.map(a => `${a.from} 对 ${a.to} 形成 ${a.type} 相位, 强度 ${a.strength}`).join('\n') || '无相位数据'}\n') || '无数据';
+
+【分析任务】
+
+用户具体要求: ${userPrompt}
+
+请提供一份全面的吠陀占星分析报告，包含以下部分：
+
+## 1. 命盘核心基调与人格特质分析
+- 解读上升点(Lagna)赋予命主的性格、外貌、生命主题
+- 分析上升主星(Lagna Lord)对自我实现能力的影响
+- 分析月亮(Chandra)的情绪本质和心智模式
+- 评估太阳(Surya)的自信、意志力和社会身份
+
+## 2. 关键领域深度分析
+请深入分析以下领域：
+
+### 2.1 事业与天命(10宫 - Career & Dharma)
+- 分析10宫主星、宫内行星及相位
+- 评估适合的职业领域
+- 评估事业高峰与挑战期
+
+### 2.2 财富与资源(2宫、11宫 - Wealth & Artha)
+- 分析2宫(积累财富)和11宫(收入来源)
+- 评估财富组合(Dhana Yogas)
+- 判断财运来源和稳定性
+
+### 2.3 婚姻与伴侣关系(7宫 - Marriage & Kama)
+- 分析7宫主星和金星(Venus)、木星(Jupiter)状态
+- 描述伴侣特征和婚姻品质
+- 评估关系的和谐与挑战
+
+### 2.4 健康与福祉(1宫、6宫 - Health)
+- 分析上升点力量和6宫(疾病)状态
+- 指出潜在健康问题和预防建议
+
+## 3. 重要Yogas(行星组合)解读
+识别并解读命盘中存在的任何重要Yogas(如Pancha Mahapurusha Yogas, Raja Yogas, Dhana Yogas, Arishta Yogas等)，解释它们如何显现。
+
+## 4. 当前运势解读(Dasha Analysis)
+- 结合当前大运(Mahadasha)，分析近期生活经历、机遇和挑战
+- 提及当前重要行星凌日的影响
+
+## 5. 总结与核心建议
+- 总结命盘核心优势与人生课题
+- 提供3-5条最关键的改善建议(Upayas)，建议应具体可操作
+
+【输出要求】
+- 字数: 1500-2500字
+- 语言: 专业而温暖
+- 格式: 使用Markdown格式，清晰的标题结构
+- 语调: 建设性、赋能性，避免恐吓性语言
+
+请开始分析：`;
+  }
+
+}
+
+module.exports = DeepSeekClient;

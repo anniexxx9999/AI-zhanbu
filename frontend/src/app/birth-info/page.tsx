@@ -49,21 +49,47 @@ export default function BirthInfoPage() {
       return;
     }
 
-    // 保存到 localStorage 并跳转
+    // 保存到 localStorage 并生成分析报告
     try {
       setSubmitting(true);
       setSubmitError(null);
 
-      const response = await astrologyAPI.calculateChart(formData);
+      console.log('开始生成星盘和分析报告...', formData);
 
-      if (!response.success || !response.data) {
-        throw new Error(response.message || response.error || '星盘生成失败，请稍后重试');
+      // 保存出生信息
+      localStorage.setItem('birthInfo', JSON.stringify(formData));
+      console.log('出生信息已保存到localStorage');
+
+      // 生成星盘数据
+      console.log('正在生成星盘数据...');
+      const chartResponse = await astrologyAPI.calculateChart(formData);
+      console.log('星盘数据响应:', chartResponse);
+      
+      if (!chartResponse.success || !chartResponse.data) {
+        throw new Error(chartResponse.message || chartResponse.error || '星盘生成失败，请稍后重试');
       }
 
-      localStorage.setItem('birthInfo', JSON.stringify(formData));
-      localStorage.setItem('latestChartData', JSON.stringify(response.data));
+      // 生成分析报告
+      console.log('正在生成分析报告...');
+      const analysisResponse = await astrologyAPI.generateAnalysis(
+        formData, 
+        '请基于我的星盘进行详细分析'
+      );
+      console.log('分析报告响应:', analysisResponse);
 
-      router.push('/dashboard');
+      if (!analysisResponse.success || !analysisResponse.data) {
+        throw new Error(analysisResponse.message || analysisResponse.error || '分析报告生成失败，请稍后重试');
+      }
+
+      // 保存数据到 localStorage
+      localStorage.setItem('latestChartData', JSON.stringify(chartResponse.data));
+      localStorage.setItem('latestAnalysisData', JSON.stringify(analysisResponse.data));
+      console.log('所有数据已保存到localStorage');
+
+      // 跳转到分析报告页面
+      console.log('准备跳转到分析报告页面...');
+      router.push('/report/analysis');
+      console.log('跳转命令已执行');
     } catch (err) {
       console.error('Failed to submit birth info:', err);
       setSubmitError(err instanceof Error ? err.message : '星盘生成失败，请稍后重试');
@@ -221,8 +247,22 @@ export default function BirthInfoPage() {
                 icon="✨"
                 disabled={submitting}
               >
-                {submitting ? '星盘生成中...' : '揭示我的命盘'}
+                {submitting ? '正在生成你的专属星盘，AI正在精心分析中...' : '揭示我的命盘'}
               </Button>
+              
+              {/* Progress Info */}
+              {submitting && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-4 text-center"
+                >
+                  <div className="inline-flex items-center gap-2 text-sm text-text-muted">
+                    <div className="animate-spin">⏳</div>
+                    <span>这可能需要30-60秒，请耐心等待...</span>
+                  </div>
+                </motion.div>
+              )}
 
               {/* Back Link */}
               <div className="text-center">

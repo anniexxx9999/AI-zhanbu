@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>传统印度占星学 - 天体位置表</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+        
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .card-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        .planet-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 220px;
+            min-width: 200px;
+        }
+        
+        .planet-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .planet-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .planet-symbol {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        
+        .planet-name {
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+        
+        .status.direct {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .status.retrograde {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .card-content {
+            padding: 20px;
+        }
+        
+        .info-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .info-line:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .label {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9em;
+            min-width: 60px;
+        }
+        
+        .value {
+            color: #2d3748;
+            font-weight: 500;
+            text-align: right;
+            font-size: 0.9em;
+            line-height: 1.3;
+        }
+        
+        @media (max-width: 1200px) {
+            .card-row {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .planet-card {
+                max-width: 300px;
+                min-width: 250px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .card-row {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .planet-card {
+                max-width: 100%;
+                min-width: 100%;
+            }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #4a5568;
+            font-style: italic;
+        }
+        
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <h1>🔮 传统印度占星学天体位置表</h1>
+        <p class="subtitle">Navagraha + Lagna - 基于1993年11月20日 14:30 北京</p>
+        
+        <div class="cards-container">
+            <div class="card-row">
+                <div class="planet-card">
+                    <div class="card-header">
+                        <div class="planet-info">
+                            <span class="planet-symbol">Asc</span>
+                            <span class="planet-name">Ascendant</span>
+                        </div>
+                        <span class="status direct">顺行</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="info-line">
+                            <span class="label">星座:</span>
+                            <span class="value">Pisces ♓</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">宫位:</span>
+                            <span class="value">第1宫</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">度数:</span>
+                            <span class="value">11° 41' 23"</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">守护星:</span>
+                            <span class="value">Jupiter</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">星宿:</span>
+                            <span class="value">Uttaraabhadra • 第3步 • 守护星 Saturn</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="planet-card">
+                    <div class="card-header">
+                        <div class="planet-info">
+                            <span class="planet-symbol">☉</span>
+                            <span class="planet-name">Sun</span>
+                        </div>
+                        <span class="status direct">顺行</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="info-line">
+                            <span class="label">星座:</span>
+                            <span class="value">Scorpio ♏</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">宫位:</span>
+                            <span class="value">第9宫</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">度数:</span>
+                            <span class="value">4° 10' 37"</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">守护星:</span>
+                            <span class="value">Mars</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">星宿:</span>
+                            <span class="value">Anuradha • 第1步 • 守护星 Saturn</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="planet-card">
+                    <div class="card-header">
+                        <div class="planet-info">
+                            <span class="planet-symbol">☽</span>
+                            <span class="planet-name">Moon</span>
+                        </div>
+                        <span class="status direct">顺行</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="info-line">
+                            <span class="label">星座:</span>
+                            <span class="value">Capricorn ♑</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">宫位:</span>
+                            <span class="value">第11宫</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">度数:</span>
+                            <span class="value">25° 13' 59"</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">守护星:</span>
+                            <span class="value">Saturn</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">星宿:</span>
+                            <span class="value">Dhanishta • 第1步 • 守护星 Mars</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="planet-card">
+                    <div class="card-header">
+                        <div class="planet-info">
+                            <span class="planet-symbol">♂</span>
+                            <span class="planet-name">Mars</span>
+                        </div>
+                        <span class="status direct">顺行</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="info-line">
+                            <span class="label">星座:</span>
+                            <span class="value">Scorpio ♏</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">宫位:</span>
+                            <span class="value">第9宫</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">度数:</span>
+                            <span class="value">14° 12' 26"</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">守护星:</span>
+                            <span class="value">Mars</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">星宿:</span>
+                            <span class="value">Anuradha • 第4步 • 守护星 Saturn</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="planet-card">
+                    <div class="card-header">
+                        <div class="planet-info">
+                            <span class="planet-symbol">☿</span>
+                            <span class="planet-name">Mercury</span>
+                        </div>
+                        <span class="status direct">顺行</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="info-line">
+                            <span class="label">星座:</span>
+                            <span class="value">Libra ♎</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">宫位:</span>
+                            <span class="value">第8宫</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">度数:</span>
+                            <span class="value">14° 50' 21"</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">守护星:</span>
+                            <span class="value">Venus</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">星宿:</span>
+                            <span class="value">Swati • 第3步 • 守护星 Rahu</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-row">
+                <div class="planet-card">
+                    <div class="card-header">
+                        <div class="planet-info">
+                            <span class="planet-symbol">♃</span>
+                            <span class="planet-name">Jupiter</span>
+                        </div>
+                        <span class="status direct">顺行</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="info-line">
+                            <span class="label">星座:</span>
+                            <span class="value">Libra ♎</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">宫位:</span>
+                            <span class="value">第8宫</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">度数:</span>
+                            <span class="value">8° 19' 16"</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">守护星:</span>
+                            <span class="value">Venus</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">星宿:</span>
+                            <span class="value">Swati • 第1步 • 守护星 Rahu</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="planet-card">
+                    <div class="card-header">
+                        <div class="planet-info">
+                            <span class="planet-symbol">♀</span>
+                            <span class="planet-name">Venus</span>
+                        </div>
+                        <span class="status direct">顺行</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="info-line">
+                            <span class="label">星座:</span>
+                            <span class="value">Libra ♎</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">宫位:</span>
+                            <span class="value">第8宫</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">度数:</span>
+                            <span class="value">20° 14' 57"</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">守护星:</span>
+                            <span class="value">Venus</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">星宿:</span>
+                            <span class="value">Visakha • 第1步 • 守护星 Jupiter</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="planet-card">
+                    <div class="card-header">
+                        <div class="planet-info">
+                            <span class="planet-symbol">♄</span>
+                            <span class="planet-name">Saturn</span>
+                        </div>
+                        <span class="status direct">顺行</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="info-line">
+                            <span class="label">星座:</span>
+                            <span class="value">Aquarius ♒</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">宫位:</span>
+                            <span class="value">第12宫</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">度数:</span>
+                            <span class="value">0° 21' 9"</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">守护星:</span>
+                            <span class="value">Saturn</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">星宿:</span>
+                            <span class="value">Dhanishta • 第3步 • 守护星 Mars</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="planet-card">
+                    <div class="card-header">
+                        <div class="planet-info">
+                            <span class="planet-symbol">☊</span>
+                            <span class="planet-name">Rahu</span>
+                        </div>
+                        <span class="status retrograde">逆行</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="info-line">
+                            <span class="label">星座:</span>
+                            <span class="value">Scorpio ♏</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">宫位:</span>
+                            <span class="value">第9宫</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">度数:</span>
+                            <span class="value">9° 32' 5"</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">守护星:</span>
+                            <span class="value">Mars</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">星宿:</span>
+                            <span class="value">Anuradha • 第2步 • 守护星 Saturn</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="planet-card">
+                    <div class="card-header">
+                        <div class="planet-info">
+                            <span class="planet-symbol">☋</span>
+                            <span class="planet-name">Ketu</span>
+                        </div>
+                        <span class="status retrograde">逆行</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="info-line">
+                            <span class="label">星座:</span>
+                            <span class="value">Taurus ♉</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">宫位:</span>
+                            <span class="value">第3宫</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">度数:</span>
+                            <span class="value">9° 32' 5"</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">守护星:</span>
+                            <span class="value">Venus</span>
+                        </div>
+                        <div class="info-line">
+                            <span class="label">星宿:</span>
+                            <span class="value">Krittika • 第4步 • 守护星 Sun</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>🌟 传统印度占星学 (Vedic Astrology) - Navagraha + Lagna 🌟</p>
+            <p>数据来源: Free Astrology API | 基于 Lahiri Ayanamsa</p>
+        </div>
+    </div>
+    
+    <script>
+        // 创建星空背景
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const numStars = 50;
+            
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        createStars();
+    </script>
+</body>
+</html>

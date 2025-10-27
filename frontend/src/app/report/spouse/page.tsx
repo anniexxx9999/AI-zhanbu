@@ -7,7 +7,6 @@ import StarField from '@/components/particles/StarField';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Navigation from '@/components/layout/Navigation';
-import SoulmatePortrait from '@/components/ai/SoulmatePortrait';
 import { FiShare2, FiDownload, FiHeart, FiStar, FiClock, FiUsers, FiTrendingUp, FiShield, FiZap } from 'react-icons/fi';
 
 export default function SpouseReportPage() {
@@ -65,10 +64,6 @@ export default function SpouseReportPage() {
               </div>
             </div>
             
-            {/* AI Soulmate Portrait */}
-            <div className="max-w-md mx-auto mb-12">
-              <SoulmatePortrait birthInfo={birthInfo} />
-            </div>
           </motion.div>
 
           {/* Introduction */}

@@ -22,212 +22,21 @@ const fallbackBirthInfo = {
 };
 
 // Core Trinity Data
-const coreTrinity = {
-  lagna: { sign: 'Leo', emoji: '🦁', mask: '你给世界的第一印象是...', desc: '自信、温暖、充满魅力的领导者形象' },
-  moon: { sign: 'Pisces', emoji: '🌙', need: '在内心深处，你真正需要的是...', desc: '情感的深度连接、梦想与灵性的滋养' },
-  sun: { sign: 'Aries', emoji: '☀️', fuel: '驱动你生命前行的燃料是...', desc: '勇气、独立与开拓新事物的冲动' }
-};
+const coreTrinity = { loading: true };
 
 // Life Energy Data
-const lifeEnergy = {
-  strongest: [
-    { planet: 'Jupiter', emoji: '✨', power: '智慧与扩张力', score: 95, desc: '你天生拥有强大的学习能力和正向影响力' },
-    { planet: 'Venus', emoji: '💕', power: '美感与关系力', score: 88, desc: '你能轻松创造和谐的人际关系与美好环境' },
-    { planet: 'Mercury', emoji: '🎯', power: '沟通与商业才能', score: 82, desc: '你的表达能力和商业头脑超越大多数人' }
-  ],
-  weakest: { planet: 'Mars', emoji: '⚡', lesson: '行动力与勇气', score: 45, desc: '学会更果断地行动，培养面对冲突的勇气' }
-};
+const lifeEnergy = { loading: true };
 
 // 12 Life Arenas - Complete Professional Astrology Data
-const lifeArenas = [
-  {
-    house: 1,
-    name: '自我与生命力',
-    nameEn: 'Identity & Vitality',
-    sanskrit: 'Lagna Bhava',
-    emoji: '🌅',
-    rating: 4,
-    sign: 'Gemini ♊',
-    lord: 'Mercury ☿',
-    lordPlacement: '位于第5宫 (创意宫)',
-    lordStrength: 'Strong (7.2/10 Shadbala)',
-    planetsIn: [],
-    aspects: [
-      { type: 'benefic', icon: '✨', description: 'Jupiter 5th aspect (吉相位 - 智慧祝福)' },
-      { type: 'malefic', icon: '⚡', description: 'Saturn 7th aspect (挑战相位 - 需要纪律)' }
-    ],
-    specialConfig: 'Mercury与Venus、Jupiter联合形成Rajayoga',
-    professionalAnalysis: '你的上升点落在Gemini，由Mercury守护。Mercury强势地位于第5宫并形成罕见的"三星Rajayoga"（与Venus、Jupiter合相）。这意味着你的个性天生聪慧、好奇心强、适应力极佳。你的生命力通过"智力创造"得到最强表达，给人的第一印象是：机智、健谈、年轻活力。',
-    judgment: {
-      type: 'favorable',
-      icon: '✅',
-      label: '极为有利',
-      reason: 'Mercury作为Lagna Lord位于三方宫（5th），且得到吉星加持，这是"智慧型人格"的典型配置'
-    },
-    advantages: [
-      '学习能力强，理解速度快',
-      '善于沟通，文字/口才出众',
-      '多才多艺，兴趣广泛'
-    ],
-    challenges: [
-      '可能过于理性，忽视情感深度',
-      '容易分散注意力，难以深耕一事',
-      '需要平衡"广度"与"深度"'
-    ],
-    keyPeriods: [
-      { name: 'Mercury Mahadasha', years: '2012-2029年', description: '这是你的"黄金成长期"，智力巅峰' },
-      { name: '5th House激活期', years: '持续', description: '创意项目、学习、恋爱都会顺利' }
-    ],
-    actionAdvice: {
-      leverage: ['多写作、演讲、教学，将智慧变现', '发展多元技能组合'],
-      cope: ['定期深度专注训练，避免浅尝辄止', '为重要项目设定专注时间块']
-    },
-    remedies: {
-      gemstone: 'Emerald (祖母绿)',
-      day: '周三 (Mercury日)',
-      mantra: 'Om Budhaya Namaha'
-    }
-  },
-  {
-    house: 2,
-    name: '财富与价值观',
-    nameEn: 'Wealth & Values',
-    sanskrit: 'Dhana Bhava',
-    emoji: '💰',
-    rating: 3,
-    sign: 'Cancer ♋',
-    lord: 'Moon ☽',
-    lordPlacement: '位于第8宫 (转化宫)',
-    lordStrength: 'Weak (3.8/10 Shadbala)',
-    planetsIn: [],
-    aspects: [
-      { type: 'malefic', icon: '⚔️', description: 'Mars 4th aspect (挑战相位 - 支出增加)' }
-    ],
-    specialConfig: '2nd Lord in 8th house - 财富波动配置',
-    professionalAnalysis: '你的财富宫由Cancer守护，Moon作为宫主落入第8宫（神秘与转化之宫）。这是一个"不稳定但有深度潜力"的配置。Moon在8th意味着你的财富来源可能与"隐秘、研究、咨询"相关，收入会有起伏，情绪影响财务决策，可能通过"遗产、保险、投资"获得财富。',
-    judgment: {
-      type: 'challenging',
-      icon: '⚠️',
-      label: '中性偏挑战',
-      reason: '2nd Lord in 8th是财务波动的经典配置，但8th house也代表"意外之财"和"深度转化"'
-    },
-    advantages: [
-      '擅长理财，对隐藏价值敏感',
-      '可能通过心理学、占星等"神秘学"赚钱',
-      '投资眼光独到（尤其股票、加密货币）'
-    ],
-    challenges: [
-      '避免情绪化消费',
-      '收入不稳定，需要储蓄缓冲',
-      '与家人的金钱观可能冲突'
-    ],
-    keyPeriods: [
-      { name: 'Moon Mahadasha', years: '1995-2005年', description: '这段时期财务不稳定' },
-      { name: 'Rahu/Ketu transit', years: '每18个月', description: '财务转折点' }
-    ],
-    actionAdvice: {
-      leverage: ['从事"转化、治愈、研究"相关工作', '投资你能深度理解的领域'],
-      cope: ['建立自动储蓄系统，对抗情绪化支出', '学习财务规划，不依赖直觉']
-    },
-    remedies: {
-      gemstone: 'Pearl (珍珠)',
-      day: '周一 (Moon日)',
-      mantra: 'Om Chandraya Namaha'
-    }
-  },
-  {
-    house: 7,
-    name: '婚姻与伴侣关系',
-    nameEn: 'Marriage & Partnership',
-    sanskrit: 'Kalatra Bhava',
-    emoji: '💍',
-    rating: 5,
-    sign: 'Sagittarius ♐',
-    lord: 'Jupiter ♃',
-    lordPlacement: '位于第5宫 (创意宫)',
-    lordStrength: 'Strong (6.8/10 Shadbala)',
-    planetsIn: [],
-    aspects: [
-      { type: 'benefic', icon: '💕', description: 'Venus aspect (自然婚姻星祝福)' },
-      { type: 'benefic', icon: '✨', description: 'Jupiter自身回望 (宫主星守护)' }
-    ],
-    specialConfig: 'Jupiter Mahapurusha Yoga + 7th Lord与Venus联合 = 理想婚姻组合',
-    professionalAnalysis: '你的7th house由Jupiter守护，Jupiter位于5th house与Venus合相。这是"完美婚姻配置"的教科书案例。Jupiter (智慧、扩张、高贵) + Venus (爱、美、艺术) 的组合意味着：你的配偶将是"有智慧、有品位、重视精神成长"的人；你们的关系会建立在"共同的价值观和创造力"之上；婚姻会带给你"幸福感和社会地位提升"。',
-    judgment: {
-      type: 'favorable',
-      icon: '✅',
-      label: '极为有利（顶级配置）',
-      reason: 'Benefic 7th lord + Venus conjunction = 爱情美满。这是"幸福婚姻"的黄金指标'
-    },
-    advantages: [
-      '吸引高质量伴侣（有智慧、有品位）',
-      '婚姻关系和谐，互相成就',
-      '配偶可能带来财富或社会资源',
-      '在婚姻中感到"被滋养"和"成长"'
-    ],
-    challenges: [
-      'Jupiter可能让你对伴侣期望过高（理想主义）',
-      '需要平衡"精神契合"与"现实磨合"',
-      '避免因对方"不够完美"而错过良缘'
-    ],
-    keyPeriods: [
-      { name: 'Jupiter Mahadasha', years: '2029-2045年', description: '婚姻黄金期，最容易遇到真命天子/天女' },
-      { name: 'Venus Antardasha', years: '2032-2035年', description: '这3年是"结婚高峰期"' }
-    ],
-    actionAdvice: {
-      leverage: [
-        '参加"文化活动、学习课程、海外旅行"',
-        '在"大学、图书馆、艺术展"等高雅场所社交',
-        '通过"导师、长辈介绍"（Jupiter代表导师）'
-      ],
-      cope: [
-        '保持精神成长，与伴侣一起学习',
-        '重视共同的价值观和信念',
-        '定期创造"浪漫与智慧并存"的约会'
-      ]
-    },
-    remedies: {
-      gemstone: 'Yellow Sapphire (黄蓝宝石) + Diamond (钻石)',
-      day: '周四 (Jupiter日) & 周五 (Venus日)',
-      mantra: 'Om Gurave Namaha | Om Shukraya Namaha'
-    }
-  },
-  // 其他宫位使用简化版数据
-  { house: 3, name: '沟通与勇气', nameEn: 'Communication & Courage', sanskrit: 'Sahaja Bhava', emoji: '💬', rating: 3, sign: 'Leo ♌', lord: 'Sun ☉', lordPlacement: '第3宫', lordStrength: 'Medium' },
-  { house: 4, name: '家庭与内心', nameEn: 'Home & Heart', sanskrit: 'Sukha Bhava', emoji: '🏠', rating: 4, sign: 'Virgo ♍', lord: 'Mercury ☿', lordPlacement: '第5宫', lordStrength: 'Strong' },
-  { house: 5, name: '创造力与子女', nameEn: 'Creativity & Children', sanskrit: 'Putra Bhava', emoji: '🎨', rating: 5, sign: 'Libra ♎', lord: 'Venus ♀', lordPlacement: '第5宫', lordStrength: 'Excellent' },
-  { house: 6, name: '健康与竞争', nameEn: 'Health & Competition', sanskrit: 'Ripu Bhava', emoji: '⚕️', rating: 3, sign: 'Scorpio ♏', lord: 'Mars ♂', lordPlacement: '第6宫', lordStrength: 'Medium' },
-  { house: 8, name: '转化与神秘', nameEn: 'Transformation & Mystery', sanskrit: 'Randhra Bhava', emoji: '🔮', rating: 3, sign: 'Capricorn ♑', lord: 'Saturn ♄', lordPlacement: '第8宫', lordStrength: 'Strong' },
-  { house: 9, name: '智慧与运气', nameEn: 'Wisdom & Fortune', sanskrit: 'Dharma Bhava', emoji: '📚', rating: 5, sign: 'Aquarius ♒', lord: 'Saturn ♄', lordPlacement: '第8宫', lordStrength: 'Strong' },
-  { house: 10, name: '事业与名望', nameEn: 'Career & Fame', sanskrit: 'Karma Bhava', emoji: '🎯', rating: 4, sign: 'Pisces ♓', lord: 'Jupiter ♃', lordPlacement: '第5宫', lordStrength: 'Strong' },
-  { house: 11, name: '收获与社交', nameEn: 'Gains & Network', sanskrit: 'Labha Bhava', emoji: '🌟', rating: 4, sign: 'Aries ♈', lord: 'Mars ♂', lordPlacement: '第6宫', lordStrength: 'Medium' },
-  { house: 12, name: '解脱与灵性', nameEn: 'Liberation & Spirituality', sanskrit: 'Vyaya Bhava', emoji: '🙏', rating: 3, sign: 'Taurus ♉', lord: 'Venus ♀', lordPlacement: '第5宫', lordStrength: 'Strong' }
-];
+const lifeArenas = [];
 
 // Dasha Timeline Data
-const dashaTimeline = [
-  { planet: 'Mercury', start: 1995, end: 2012, color: '#10B981', theme: '沟通与学习' },
-  { planet: 'Venus', start: 2012, end: 2032, color: '#FF69B4', theme: '爱与创造', isCurrent: true },
-  { planet: 'Sun', start: 2032, end: 2038, color: '#F59E0B', theme: '权威与成就' },
-  { planet: 'Moon', start: 2038, end: 2048, color: '#8B5CF6', theme: '情感与直觉' },
-];
+const dashaTimeline = [];
 
-const currentDasha = {
-  major: { planet: 'Venus', period: '2012-2032', theme: '这是一个关于爱、创造力与享受的生命季节' },
-  minor: { planet: 'Mercury', period: '2023-2025', focus: '焦点转向学习、沟通与商业' },
-  strategy: '尽情投入艺术创作、美化生活环境，并积极拓展社交圈。这是播种"美"与"关系"的最佳时机。'
-};
+const currentDasha = { loading: true };
 
 // Cosmic Toolkit
-const cosmicToolkit = {
-  colors: ['黄色', '金色', '橙色'],
-  gem: '黄宝石',
-  gemPlanet: 'Jupiter',
-  mantra: 'Om Brihaspat aye Namaha',
-  activities: ['与家人共度时光', '装饰家居环境', '阅读哲学或灵性书籍'],
-  luckyDay: '周四',
-  element: '火'
-};
+const cosmicToolkit = { loading: true };
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -293,46 +102,55 @@ export default function DashboardPage() {
 
   const effectiveBirthInfo = birthInfoState ?? fallbackBirthInfo;
 
-  const displayCoreTrinity = useMemo(() => ({
-    lagna: {
-      ...coreTrinity.lagna,
-      sign: chartData?.risingSign || coreTrinity.lagna.sign,
-    },
-    moon: {
-      ...coreTrinity.moon,
-      sign: chartData?.moonSign || coreTrinity.moon.sign,
-    },
-    sun: {
-      ...coreTrinity.sun,
-      sign: chartData?.sunSign || coreTrinity.sun.sign,
-    },
-  }), [chartData]);
+  const displayCoreTrinity = useMemo(() => {
+    if (!chartData) {
+      return { loading: true };
+    }
+    return {
+      lagna: {
+        sign: chartData.risingSign || '—',
+        emoji: '🦁',
+        mask: '—',
+        desc: '—'
+      },
+      moon: {
+        sign: chartData.moonSign || '—',
+        emoji: '🌙',
+        need: '—',
+        desc: '—'
+      },
+      sun: {
+        sign: chartData.sunSign || '—',
+        emoji: '☀️',
+        fuel: '—',
+        desc: '—'
+      }
+    };
+  }, [chartData]);
 
   const displayLifeArenas = useMemo(() => {
-    if (!chartData) {
-      return lifeArenas;
+    if (!chartData || !chartData.houses) {
+      return [];
     }
 
     return chartData.houses.map((house) => {
-      const fallback = lifeArenas.find((arena) => arena.house === house.number);
       const planetsIn = house.planets.map(
         (planet) => `${planet.name}${planet.signSymbol ? ` ${planet.signSymbol}` : ''}`
       );
 
       return {
-        ...fallback,
         house: house.number,
-        name: house.name || fallback?.name || `第${house.number}宫`,
-        nameEn: house.nameEn || fallback?.nameEn || '',
-        sanskrit: house.sanskrit || fallback?.sanskrit || '',
-        emoji: fallback?.emoji || '🏠',
-        rating: fallback?.rating ?? 3,
+        name: house.name || `第${house.number}宫`,
+        nameEn: house.nameEn || '',
+        sanskrit: house.sanskrit || '',
+        emoji: '🏠',
+        rating: 3,
         sign: house.signSymbol ? `${house.sign} ${house.signSymbol}` : house.sign,
-        lord: house.lord || fallback?.lord || '未知',
-        lordPlacement: house.lordPlacement || fallback?.lordPlacement || '未知',
-        lordStrength: house.lordStrength || fallback?.lordStrength || '未知',
-        planetsIn: planetsIn.length > 0 ? planetsIn : fallback?.planetsIn || [],
-        aspects: fallback?.aspects || [],
+        lord: house.lord || '未知',
+        lordPlacement: house.lordPlacement || '未知',
+        lordStrength: house.lordStrength || '未知',
+        planetsIn: planetsIn,
+        aspects: [],
       };
     });
   }, [chartData]);
@@ -622,7 +440,7 @@ export default function DashboardPage() {
                 </div>
                 
                 <div className="space-y-4">
-                  {lifeEnergy.strongest.map((item, idx) => (
+                  {lifeEnergy.strongest && Array.isArray(lifeEnergy.strongest) && lifeEnergy.strongest.map((item, idx) => (
                     <motion.div
                       key={idx}
                       initial={{ opacity: 0, x: -20 }}
@@ -667,22 +485,22 @@ export default function DashboardPage() {
                   transition={{ delay: 0.4 }}
                   className="p-6 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
                 >
-                  <span className="text-5xl mb-4 block">{lifeEnergy.weakest.emoji}</span>
-                  <div className="font-semibold text-xl text-white mb-2">{lifeEnergy.weakest.planet}</div>
-                  <div className="text-sm text-amber-400 mb-3">{lifeEnergy.weakest.lesson}</div>
-                  <p className="text-sm text-gray-300 leading-relaxed mb-4">{lifeEnergy.weakest.desc}</p>
+                  <span className="text-5xl mb-4 block">{lifeEnergy.weakest?.emoji || "⚡"}</span>
+                  <div className="font-semibold text-xl text-white mb-2">{lifeEnergy.weakest?.planet || "—"}</div>
+                  <div className="text-sm text-amber-400 mb-3">{lifeEnergy.weakest?.lesson || "—"}</div>
+                  <p className="text-sm text-gray-300 leading-relaxed mb-4">{lifeEnergy.weakest?.desc || "—"}</p>
                   
                   {/* Progress bar */}
                   <div className="flex items-center gap-3">
                     <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: `${lifeEnergy.weakest.score}%` }}
+                        animate={{ width: `${lifeEnergy.weakest?.score || 0}%` }}
                         transition={{ delay: 0.6, duration: 0.8 }}
                         className="h-full bg-gradient-to-r from-amber-400 to-orange-400"
                       />
                     </div>
-                    <div className="text-xs text-amber-300 font-mono">{lifeEnergy.weakest.score}/100</div>
+                    <div className="text-xs text-amber-300 font-mono">{lifeEnergy.weakest?.score || 0}/100</div>
                   </div>
 
                   <div className="mt-6 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
@@ -1048,6 +866,7 @@ export default function DashboardPage() {
             </AnimatePresence>
           </motion.section>
 
+          */}
           {/* Module 3: Dasha Timeline - 你的生命季节 */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
@@ -1143,11 +962,11 @@ export default function DashboardPage() {
                 <div className="flex-1">
                   <div className="text-xs text-pink-300 mb-2 uppercase tracking-wide">Current Season</div>
                   <h3 className="font-serif text-2xl text-white mb-2">
-                    {currentDasha.major.planet} 大运期
+                    {currentDasha.major?.planet || "—"} 大运期
                   </h3>
-                  <div className="text-sm text-purple-300 mb-4">{currentDasha.major.period}</div>
+                  <div className="text-sm text-purple-300 mb-4">{currentDasha.major?.period || "—"}</div>
                   
-                  <p className="text-white mb-6 leading-relaxed">{currentDasha.major.theme}</p>
+                  <p className="text-white mb-6 leading-relaxed">{currentDasha.major?.theme || "—"}</p>
 
                   <div className="p-4 rounded-xl bg-white/5 mb-4">
                     <div className="flex items-center gap-2 mb-2">
@@ -1155,8 +974,8 @@ export default function DashboardPage() {
                       <div className="text-sm text-purple-300 font-semibold">当前焦点 (次运期)</div>
                     </div>
                     <p className="text-sm text-gray-300">
-                      在 <span className="text-white font-medium">{currentDasha.minor.planet}</span> 的次运期 ({currentDasha.minor.period})，
-                      {currentDasha.minor.focus}。
+                      在 <span className="text-white font-medium">{currentDasha.minor?.planet || "—"}</span> 的次运期 ({currentDasha.minor?.period || "—"})，
+                      {currentDasha.minor?.focus || "—"}。
                     </p>
                   </div>
 
@@ -1166,7 +985,7 @@ export default function DashboardPage() {
                       <div className="text-sm text-purple-300 font-semibold">本季策略</div>
                     </div>
                     <p className="text-sm text-white leading-relaxed">
-                      {currentDasha.strategy}
+                      {currentDasha.strategy || "—"}
                     </p>
                   </div>
                 </div>
@@ -1204,7 +1023,7 @@ export default function DashboardPage() {
                   <div>
                     <div className="text-xs text-yellow-300 mb-2">💛 Power Colors</div>
                     <div className="flex gap-2">
-                      {cosmicToolkit.colors.map((color, idx) => (
+                      {cosmicToolkit.colors && Array.isArray(cosmicToolkit.colors) ? cosmicToolkit.colors.map : [].map((color, idx) => (
                         <div key={idx} className="px-3 py-2 rounded-lg bg-white/10 text-sm text-white">
                           {color}
           </div>
@@ -1248,7 +1067,7 @@ export default function DashboardPage() {
                   <div>
                     <div className="text-xs text-purple-300 mb-2">✨ 推荐活动 (充能方式)</div>
                     <ul className="space-y-2">
-                      {cosmicToolkit.activities.map((activity, idx) => (
+                      {cosmicToolkit.activities && Array.isArray(cosmicToolkit.activities) ? cosmicToolkit.activities.map : [].map((activity, idx) => (
                         <li key={idx} className="flex items-start gap-2 text-sm text-gray-300">
                           <span className="text-purple-400 mt-0.5">•</span>
                           <span>{activity}</span>
@@ -1293,16 +1112,29 @@ export default function DashboardPage() {
                   揭示你们的宿命连接与爱情蓝图。
                 </p>
 
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => router.push('/report/spouse')}
-                  className="inline-flex items-center gap-2 px-10 py-5 rounded-full bg-white text-[#FF69B4] hover:shadow-2xl transition-all duration-300 font-semibold text-lg mb-4"
-                >
-                  <FiHeart className="text-xl" />
-                  查看灵魂伴侣报告
-          <FiChevronRight />
-                </motion.button>
+                <div className="flex flex-col sm:flex-row gap-4 items-center">
+                  <motion.button
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => router.push('/report/analysis')}
+                    className="inline-flex items-center gap-2 px-10 py-5 rounded-full bg-gradient-to-r from-[#FF69B4] to-[#FF1493] text-white hover:shadow-2xl transition-all duration-300 font-semibold text-lg"
+                  >
+                    <FiStar className="text-xl" />
+                    生成详细分析报告
+                    <FiChevronRight />
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => router.push('/report/spouse')}
+                    className="inline-flex items-center gap-2 px-10 py-5 rounded-full bg-white text-[#FF69B4] hover:shadow-2xl transition-all duration-300 font-semibold text-lg"
+                  >
+                    <FiHeart className="text-xl" />
+                    查看灵魂伴侣报告
+                    <FiChevronRight />
+                  </motion.button>
+                </div>
 
                 <p className="text-sm text-[#8B7794]">
                   ✨ 已有 10,000+ 人找到真爱
