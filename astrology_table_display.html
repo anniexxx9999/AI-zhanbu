@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>传统印度占星学 - 天体位置表</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        td {
+            padding: 18px 15px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        
+        tr:hover {
+            background-color: #edf2f7;
+            transform: scale(1.01);
+            transition: all 0.3s ease;
+        }
+        
+        .planet-name {
+            font-weight: bold;
+            color: #2d3748;
+            font-size: 1.1em;
+        }
+        
+        .planet-symbol {
+            font-size: 1.5em;
+            margin-right: 8px;
+        }
+        
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        .status.direct {
+            background-color: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .status.retrograde {
+            background-color: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .zodiac-sign {
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        .house {
+            background-color: #e6fffa;
+            color: #234e52;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .degree {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .lord {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .nakshatra {
+            font-size: 0.9em;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+        
+        .nakshatra-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .pada {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .vimsottari-lord {
+            color: #e53e3e;
+            font-weight: 600;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #4a5568;
+            font-style: italic;
+        }
+        
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <h1>🔮 传统印度占星学天体位置表</h1>
+        <p class="subtitle">Navagraha + Lagna - 基于1993年11月20日 14:30 北京</p>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>天体</th>
+                        <th>状态</th>
+                        <th>星座</th>
+                        <th>宫位</th>
+                        <th>度数</th>
+                        <th>守护星</th>
+                        <th>纳克沙特拉</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="planet-name">
+                            <span class="planet-symbol">Asc</span>
+                            Ascendant
+                        </td>
+                        <td><span class="status direct">顺行</span></td>
+                        <td class="zodiac-sign">Pisces ♓</td>
+                        <td><span class="house">第1宫</span></td>
+                        <td class="degree">11° 41' 23"</td>
+                        <td class="lord">Jupiter</td>
+                        <td class="nakshatra">
+                            <div class="nakshatra-name">Uttaraabhadra</div>
+                            <div><span class="pada">第3步</span> • 守护星 <span class="vimsottari-lord">Saturn</span></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="planet-name">
+                            <span class="planet-symbol">☉</span>
+                            Sun
+                        </td>
+                        <td><span class="status direct">顺行</span></td>
+                        <td class="zodiac-sign">Scorpio ♏</td>
+                        <td><span class="house">第9宫</span></td>
+                        <td class="degree">4° 10' 37"</td>
+                        <td class="lord">Mars</td>
+                        <td class="nakshatra">
+                            <div class="nakshatra-name">Anuradha</div>
+                            <div><span class="pada">第1步</span> • 守护星 <span class="vimsottari-lord">Saturn</span></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="planet-name">
+                            <span class="planet-symbol">☽</span>
+                            Moon
+                        </td>
+                        <td><span class="status direct">顺行</span></td>
+                        <td class="zodiac-sign">Capricorn ♑</td>
+                        <td><span class="house">第11宫</span></td>
+                        <td class="degree">25° 13' 59"</td>
+                        <td class="lord">Saturn</td>
+                        <td class="nakshatra">
+                            <div class="nakshatra-name">Dhanishta</div>
+                            <div><span class="pada">第1步</span> • 守护星 <span class="vimsottari-lord">Mars</span></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="planet-name">
+                            <span class="planet-symbol">♂</span>
+                            Mars
+                        </td>
+                        <td><span class="status direct">顺行</span></td>
+                        <td class="zodiac-sign">Scorpio ♏</td>
+                        <td><span class="house">第9宫</span></td>
+                        <td class="degree">14° 12' 26"</td>
+                        <td class="lord">Mars</td>
+                        <td class="nakshatra">
+                            <div class="nakshatra-name">Anuradha</div>
+                            <div><span class="pada">第4步</span> • 守护星 <span class="vimsottari-lord">Saturn</span></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="planet-name">
+                            <span class="planet-symbol">☿</span>
+                            Mercury
+                        </td>
+                        <td><span class="status direct">顺行</span></td>
+                        <td class="zodiac-sign">Libra ♎</td>
+                        <td><span class="house">第8宫</span></td>
+                        <td class="degree">14° 50' 21"</td>
+                        <td class="lord">Venus</td>
+                        <td class="nakshatra">
+                            <div class="nakshatra-name">Swati</div>
+                            <div><span class="pada">第3步</span> • 守护星 <span class="vimsottari-lord">Rahu</span></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="planet-name">
+                            <span class="planet-symbol">♃</span>
+                            Jupiter
+                        </td>
+                        <td><span class="status direct">顺行</span></td>
+                        <td class="zodiac-sign">Libra ♎</td>
+                        <td><span class="house">第8宫</span></td>
+                        <td class="degree">8° 19' 16"</td>
+                        <td class="lord">Venus</td>
+                        <td class="nakshatra">
+                            <div class="nakshatra-name">Swati</div>
+                            <div><span class="pada">第1步</span> • 守护星 <span class="vimsottari-lord">Rahu</span></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="planet-name">
+                            <span class="planet-symbol">♀</span>
+                            Venus
+                        </td>
+                        <td><span class="status direct">顺行</span></td>
+                        <td class="zodiac-sign">Libra ♎</td>
+                        <td><span class="house">第8宫</span></td>
+                        <td class="degree">20° 14' 57"</td>
+                        <td class="lord">Venus</td>
+                        <td class="nakshatra">
+                            <div class="nakshatra-name">Visakha</div>
+                            <div><span class="pada">第1步</span> • 守护星 <span class="vimsottari-lord">Jupiter</span></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="planet-name">
+                            <span class="planet-symbol">♄</span>
+                            Saturn
+                        </td>
+                        <td><span class="status direct">顺行</span></td>
+                        <td class="zodiac-sign">Aquarius ♒</td>
+                        <td><span class="house">第12宫</span></td>
+                        <td class="degree">0° 21' 9"</td>
+                        <td class="lord">Saturn</td>
+                        <td class="nakshatra">
+                            <div class="nakshatra-name">Dhanishta</div>
+                            <div><span class="pada">第3步</span> • 守护星 <span class="vimsottari-lord">Mars</span></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="planet-name">
+                            <span class="planet-symbol">☊</span>
+                            Rahu
+                        </td>
+                        <td><span class="status retrograde">逆行</span></td>
+                        <td class="zodiac-sign">Scorpio ♏</td>
+                        <td><span class="house">第9宫</span></td>
+                        <td class="degree">9° 32' 5"</td>
+                        <td class="lord">Mars</td>
+                        <td class="nakshatra">
+                            <div class="nakshatra-name">Anuradha</div>
+                            <div><span class="pada">第2步</span> • 守护星 <span class="vimsottari-lord">Saturn</span></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="planet-name">
+                            <span class="planet-symbol">☋</span>
+                            Ketu
+                        </td>
+                        <td><span class="status retrograde">逆行</span></td>
+                        <td class="zodiac-sign">Taurus ♉</td>
+                        <td><span class="house">第3宫</span></td>
+                        <td class="degree">9° 32' 5"</td>
+                        <td class="lord">Venus</td>
+                        <td class="nakshatra">
+                            <div class="nakshatra-name">Krittika</div>
+                            <div><span class="pada">第4步</span> • 守护星 <span class="vimsottari-lord">Sun</span></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <p>🌟 传统印度占星学 (Vedic Astrology) - Navagraha + Lagna 🌟</p>
+            <p>数据来源: Free Astrology API | 基于 Lahiri Ayanamsa</p>
+        </div>
+    </div>
+    
+    <script>
+        // 创建星空背景
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const numStars = 50;
+            
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        createStars();
+    </script>
+</body>
+</html>

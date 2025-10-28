@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { astrologyAPI, BirthInfo, ChartData } from '@/services/api';
+import { astrologyAPI, BirthInfo, ChartData, PlanetPosition } from '@/services/api';
 import { 
   FiHeart, FiChevronDown, FiChevronLeft, FiChevronRight, FiStar, 
   FiTrendingUp, FiClock, FiZap, FiTarget, FiLock, FiBookOpen,
@@ -204,6 +204,41 @@ const lifeArenas = [
   { house: 12, name: '解脱与灵性', nameEn: 'Liberation & Spirituality', sanskrit: 'Vyaya Bhava', emoji: '🙏', rating: 3, sign: 'Taurus ♉', lord: 'Venus ♀', lordPlacement: '第5宫', lordStrength: 'Strong' }
 ];
 
+const planetDisplayOrder = [
+  'Ascendant',
+  'Sun',
+  'Moon',
+  'Mars',
+  'Mercury',
+  'Jupiter',
+  'Venus',
+  'Saturn',
+  'Rahu',
+  'Ketu',
+  'Uranus',
+  'Neptune',
+  'Pluto'
+];
+
+const formatPlanetDegrees = (planet: PlanetPosition) => {
+  const degree = Number.isFinite(planet.degree) ? planet.degree : 0;
+  const minute = Number.isFinite(planet.minute) ? planet.minute : 0;
+  const second = Number.isFinite(planet.second) ? planet.second : 0;
+  return `${degree}° ${minute}' ${second}"`;
+};
+
+const formatNakshatra = (nakshatra?: PlanetPosition['nakshatra'] | null) => {
+  if (!nakshatra || !nakshatra.name) {
+    return '—';
+  }
+
+  const pada = nakshatra.pada ? ` • 第${nakshatra.pada}步` : '';
+  const lord = nakshatra.vimsottariLord ? ` • 守护星 ${nakshatra.vimsottariLord}` : '';
+  return `${nakshatra.name}${pada}${lord}`;
+};
+
+const retrogradeLabel = (retrograde: boolean) => (retrograde ? '逆行' : '顺行');
+
 // Dasha Timeline Data
 const dashaTimeline = [
   { planet: 'Mercury', start: 1995, end: 2012, color: '#10B981', theme: '沟通与学习' },
@@ -335,6 +370,41 @@ export default function DashboardPage() {
         aspects: fallback?.aspects || [],
       };
     });
+  }, [chartData]);
+
+  const planetInsights = useMemo(() => {
+    if (!chartData?.planets || chartData.planets.length === 0) {
+      return [];
+    }
+
+    const orderMap = new Map<string, number>(
+      planetDisplayOrder.map((name, index) => [name, index])
+    );
+
+    return [...chartData.planets]
+      .sort((a, b) => {
+        const orderA = orderMap.get(a.name) ?? 99;
+        const orderB = orderMap.get(b.name) ?? 99;
+        return orderA - orderB;
+      })
+      .map((planet) => {
+        const signLabel = planet.signSymbol
+          ? `${planet.zodiacSignName || planet.sign} ${planet.signSymbol}`
+          : planet.zodiacSignName || planet.sign;
+        const retrogradeBadgeClass = planet.retrograde
+          ? 'bg-red-500/20 text-red-200 border border-red-500/30'
+          : 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/30';
+
+        return {
+          ...planet,
+          signLabel,
+          formattedDegree: formatPlanetDegrees(planet),
+          nakshatraText: formatNakshatra(planet.nakshatra),
+          retrogradeText: retrogradeLabel(planet.retrograde),
+          retrogradeBadgeClass,
+          houseLabel: `第${planet.house}宫`
+        };
+      });
   }, [chartData]);
 
   // 当前年龄和时间轴位置
@@ -1048,7 +1118,84 @@ export default function DashboardPage() {
             </AnimatePresence>
           </motion.section>
 
-          {/* Module 3: Dasha Timeline - 你的生命季节 */}
+          {/* Module 3: Planetary Insights - 行星能量总览 */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            className="mb-12"
+          >
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-serif text-white mb-3 flex items-center justify-center gap-2">
+                <span className="text-3xl">🪐</span>
+                行星能量总览
+                <span className="text-sm text-[#E8D5F2] font-normal">(Planets • Sign • Nakshatra)</span>
+              </h2>
+              <p className="text-[#E8D5F2]">
+                每一颗行星都在述说你的生命主题，点击行星卡片，感受宇宙的低语
+              </p>
+            </div>
+
+            {planetInsights.length > 0 ? (
+              <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+                {planetInsights.map((planet, index) => (
+                  <motion.div
+                    key={`${planet.name}-${index}`}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 + index * 0.05 }}
+                    className="relative rounded-2xl p-6 bg-gradient-to-br from-[rgba(255,182,217,0.12)] via-[rgba(199,184,234,0.08)] to-[rgba(255,182,217,0.12)] border border-[rgba(255,182,217,0.25)] backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.35)] hover:shadow-[0_12px_40px_rgba(255,182,217,0.25)] transition-shadow"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl">{planet.symbol || '🪐'}</span>
+                        <div>
+                          <div className="text-lg text-white font-semibold">{planet.name}</div>
+                          {planet.localizedName && (
+                            <div className="text-xs text-[#C7B8EA] mt-0.5">{planet.localizedName}</div>
+                          )}
+                        </div>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${planet.retrogradeBadgeClass}`}>
+                        {planet.retrogradeText}
+                      </span>
+                    </div>
+
+                    <div className="space-y-3 text-sm text-[#E8D5F2]">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[#C7B8EA]">星座</span>
+                        <span className="text-white font-semibold text-right">{planet.signLabel}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[#C7B8EA]">宫位</span>
+                        <span className="text-white text-right">{planet.houseLabel}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[#C7B8EA]">度数</span>
+                        <span className="text-white font-mono text-right">{planet.formattedDegree}</span>
+                      </div>
+                      {planet.zodiacSignLord && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-[#C7B8EA]">守护星</span>
+                          <span className="text-white text-right">{planet.zodiacSignLord}</span>
+                        </div>
+                      )}
+                      <div>
+                        <span className="text-[#C7B8EA] block mb-1">星宿</span>
+                        <span className="text-white text-sm leading-relaxed">{planet.nakshatraText}</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-purple-500/40 bg-purple-500/5 py-12 text-center text-[#C7B8EA]">
+                正在等待行星位置数据，请稍候片刻 ✨
+              </div>
+            )}
+          </motion.section>
+
+          {/* Module 4: Dasha Timeline - 你的生命季节 */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
