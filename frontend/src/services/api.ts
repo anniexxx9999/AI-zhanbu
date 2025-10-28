@@ -165,7 +165,7 @@ class ApiClient {
   }
 
   async calculateChart(birthInfo: BirthInfo): Promise<ApiResponse<ChartData>> {
-    return this.request('/astrology/chart', {
+    return this.request('/api/astrology/chart', {
       method: 'POST',
       body: JSON.stringify(birthInfo),
     });
