@@ -1,8 +1,8 @@
 const stripTrailingSlash = (url: string) => url.replace(/\/+$/, '');
 
 const resolveDefaultBaseUrl = () => {
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return stripTrailingSlash(process.env.NEXT_PUBLIC_API_URL);
+  if (process.env.NEXT_PUBLIC_API_BASE_URL) {
+    return stripTrailingSlash(process.env.NEXT_PUBLIC_API_BASE_URL);
   }
 
   if (typeof window !== 'undefined') {
@@ -163,7 +163,7 @@ class ApiClient {
   }
 }
 
-export const apiClient = new ApiClient(process.env.NEXT_PUBLIC_API_URL);
+export const apiClient = new ApiClient(process.env.NEXT_PUBLIC_API_BASE_URL);
 
 export const astrologyAPI = {
   calculateChart: (birthInfo: BirthInfo) => apiClient.calculateChart(birthInfo),
