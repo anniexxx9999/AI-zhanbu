@@ -8,7 +8,7 @@ import Navigation from '@/components/layout/Navigation';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { 
-  FiCheckCircle, FiStar, FiCrown, FiZap, FiGift, FiDownload,
+  FiCheckCircle, FiStar, FiZap, FiGift, FiDownload,
   FiShare2, FiHeart, FiBookOpen, FiTrendingUp, FiZap as FiZapIcon
 } from 'react-icons/fi';
 

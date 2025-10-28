@@ -42,12 +42,13 @@ export default function Input({
           </div>
         )}
         
-        <motion.input
+        <input
           {...props}
           className={`
             input-field
             ${icon ? 'pl-12' : ''}
             ${error ? 'border-coral-pink' : ''}
+            focus:scale-[1.02] transition-transform duration-200
           `}
           onFocus={(e) => {
             setIsFocused(true);
@@ -57,7 +58,6 @@ export default function Input({
             setIsFocused(false);
             props.onBlur?.(e);
           }}
-          whileFocus={{ scale: 1.02 }}
         />
         
         {isFocused && (

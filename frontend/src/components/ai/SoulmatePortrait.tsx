@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { FiRefreshCw, FiDownload, FiShare2, FiHeart, FiStar, FiEye, FiZap } from 'react-icons/fi';
 import { generateSoulmatePrompt, generateMultiplePrompts, getAstrologicalInsights, AstrologicalData } from '@/utils/aiPromptGenerator';
 
@@ -17,7 +18,7 @@ export default function SoulmatePortrait({ birthInfo, astrologicalData }: Soulma
   const [isLiked, setIsLiked] = useState(false);
 
   // 基于占星数据生成AI提示词
-  const generatePrompt = () => {
+  const generatePrompt = useCallback(() => {
     const astroData: AstrologicalData = {
       sunSign: astrologicalData?.sunSign || 'Leo',
       moonSign: astrologicalData?.moonSign || 'Pisces',
@@ -33,10 +34,10 @@ export default function SoulmatePortrait({ birthInfo, astrologicalData }: Soulma
       quality: 'high',
       mood: 'mysterious'
     });
-  };
+  }, [astrologicalData]);
 
   // 模拟AI图片生成
-  const generateImage = async () => {
+  const generateImage = useCallback(async () => {
     setIsGenerating(true);
     const prompt = generatePrompt();
     setGenerationPrompt(prompt);
@@ -55,13 +56,13 @@ export default function SoulmatePortrait({ birthInfo, astrologicalData }: Soulma
     const randomImage = placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
     setCurrentImage(randomImage);
     setIsGenerating(false);
-  };
+  }, [generatePrompt]);
 
   useEffect(() => {
     if (birthInfo) {
       generateImage();
     }
-  }, [birthInfo]);
+  }, [birthInfo, astrologicalData, generateImage]);
 
 
   const handleDownload = () => {
@@ -114,10 +115,13 @@ export default function SoulmatePortrait({ birthInfo, astrologicalData }: Soulma
             </div>
           ) : currentImage ? (
             <div className="relative">
-              <img
+              <Image
                 src={currentImage}
                 alt="Soulmate Portrait"
+                width={400}
+                height={600}
                 className="w-full aspect-[3/4] object-cover rounded-xl shadow-2xl"
+                priority
               />
               
               {/* 图片叠加效果 */}

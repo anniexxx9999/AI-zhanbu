@@ -268,7 +268,7 @@ export default function SpouseReportPage() {
                   <h4 className="text-lg font-semibold text-green-300 mb-2">当前大运</h4>
                   <p className="text-green-200">
                     您当前正处于<strong>木星大运（Guru Mahadasha）</strong>之中（2016-2032）。
-                    大运主木星本身就是您的第七宫主，这16年是您婚姻的"大环境机遇期"。
+                    大运主木星本身就是您的第七宫主，这16年是您婚姻的&ldquo;大环境机遇期&rdquo;。
                   </p>
                 </div>
                 
@@ -276,7 +276,7 @@ export default function SpouseReportPage() {
                   <h4 className="text-lg font-semibold text-yellow-300 mb-2">关键时期</h4>
                   <p className="text-yellow-200">
                     木星大运-金星次运（Guru-Shukra Dasha）（2024年6月 - 2027年2月）是启动婚姻的最关键时期。
-                    大运主（七宫主）与次运主（婚姻指示星）在本命盘中紧密合相，这是最强烈的"正缘"信号。
+                    大运主（七宫主）与次运主（婚姻指示星）在本命盘中紧密合相，这是最强烈的&ldquo;正缘&rdquo;信号。
                   </p>
                 </div>
                 

@@ -49,11 +49,20 @@ export interface PlanetPosition {
   house: number;
   sign: string;
   signSymbol: string;
+  zodiacSignName?: string;
+  zodiacSignLord?: string;
+  localizedName?: string;
   degree: number;
   minute: number;
   second: number;
   retrograde: boolean;
   speed: number;
+  nakshatra?: {
+    number: number;
+    name: string;
+    pada: number;
+    vimsottariLord: string;
+  };
 }
 
 export interface House {
