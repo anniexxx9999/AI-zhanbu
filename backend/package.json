@@ -2,12 +2,12 @@
   "name": "astrosoul-backend",
   "version": "1.0.0",
   "description": "AstroSoul Backend API",
-  "main": "dist/server.js",
+  "main": "server.js",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc && node dist/server.js",
-    "start": "node dist/server.js",
-    "watch": "tsc --watch"
+    "build": "echo 'No build step needed'",
+    "dev": "node server.js",
+    "start": "node server.js",
+    "watch": "node server.js"
   },
   "dependencies": {
     "express": "^4.18.2",
