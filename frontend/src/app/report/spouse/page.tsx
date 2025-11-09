@@ -8,21 +8,106 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Navigation from '@/components/layout/Navigation';
 import SoulmatePortrait from '@/components/ai/SoulmatePortrait';
-import { FiShare2, FiDownload, FiHeart, FiStar, FiClock, FiUsers, FiTrendingUp, FiShield, FiZap } from 'react-icons/fi';
+import { astrologyAPI } from '@/services/api';
+import { FiShare2, FiDownload, FiHeart, FiStar, FiClock, FiUsers, FiTrendingUp, FiShield, FiZap, FiLoader } from 'react-icons/fi';
+
+interface ReportData {
+  fullContent: string;
+  sections: {
+    introduction: string;
+    personality: string;
+    appearance: string;
+    meeting: string;
+    relationship: string;
+    conclusion: string;
+  };
+  keyData: {
+    risingSign: string;
+    sunSign: string;
+    moonSign: string;
+    seventhHouse: {
+      sign: string;
+      lord: string;
+      planets: Array<{ name: string; sign: string }>;
+    };
+    venus: {
+      sign: string;
+      house: number;
+      nakshatra?: string;
+    } | null;
+    jupiter: {
+      sign: string;
+      house: number;
+    } | null;
+  };
+  birthInfo: any;
+  metadata: {
+    wordCount: number;
+    generatedAt: string;
+  };
+}
 
 export default function SpouseReportPage() {
   const router = useRouter();
   const [birthInfo, setBirthInfo] = useState<any>(null);
-  const [isTyping, setIsTyping] = useState(true);
+  const [chartData, setChartData] = useState<any>(null);
+  const [reportData, setReportData] = useState<ReportData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem('birthInfo');
-    if (stored) {
-      setBirthInfo(JSON.parse(stored));
-    }
+    const loadData = async () => {
+      try {
+        // 从localStorage获取数据
+        const storedBirthInfo = localStorage.getItem('birthInfo');
+        const storedChartData = localStorage.getItem('latestChartData');
+        
+        if (storedBirthInfo) {
+          setBirthInfo(JSON.parse(storedBirthInfo));
+        }
+        
+        if (storedChartData) {
+          const parsedChartData = JSON.parse(storedChartData);
+          setChartData(parsedChartData);
+          
+          // 调用API生成报告
+          if (parsedChartData && storedBirthInfo) {
+            setIsLoading(true);
+            setError(null);
+            
+            try {
+              const response = await astrologyAPI.generateSpouseReport(
+                parsedChartData,
+                JSON.parse(storedBirthInfo)
+              );
+              
+              if (response.success && response.data) {
+                setReportData(response.data);
+              } else {
+                setError(response.error || response.message || '报告生成失败');
+              }
+            } catch (err: any) {
+              console.error('生成报告失败:', err);
+              setError(err.message || '报告生成失败，请稍后重试');
+            } finally {
+              setIsLoading(false);
+            }
+          } else {
+            setIsLoading(false);
+            setError('缺少星盘数据，请先生成星盘');
+          }
+        } else {
+          setIsLoading(false);
+          setError('缺少星盘数据，请先生成星盘');
+        }
+      } catch (err: any) {
+        console.error('加载数据失败:', err);
+        setError('加载数据失败');
+        setIsLoading(false);
+      }
+    };
     
-    // 模拟打字机效果完成
-    setTimeout(() => setIsTyping(false), 3000);
+    loadData();
   }, []);
 
   const shareQuote = (quote: string) => {
@@ -40,6 +125,44 @@ export default function SpouseReportPage() {
 
         {/* Report Content */}
         <div className="max-w-5xl mx-auto px-6 py-12">
+          {/* Loading State */}
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex flex-col items-center justify-center min-h-[60vh]"
+            >
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                className="w-16 h-16 border-4 border-purple-400 border-t-transparent rounded-full mb-4"
+              />
+              <p className="text-purple-300 text-lg">AI正在生成您的专属报告...</p>
+              <p className="text-purple-400 text-sm mt-2">这可能需要10-30秒</p>
+            </motion.div>
+          )}
+
+          {/* Error State */}
+          {error && !isLoading && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8"
+            >
+              <Card glow="red">
+                <div className="text-center">
+                  <p className="text-red-300 mb-4">{error}</p>
+                  <Button onClick={() => router.push('/birth-info')}>
+                    返回生成星盘
+                  </Button>
+                </div>
+              </Card>
+            </motion.div>
+          )}
+
+          {/* Report Content - Only show when data is loaded */}
+          {!isLoading && !error && reportData && (
+            <>
           {/* Header Section */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -56,7 +179,17 @@ export default function SpouseReportPage() {
               <div className="flex items-center justify-center gap-4 text-sm text-purple-400">
                 <span className="flex items-center gap-2">
                   <FiClock className="w-4 h-4" />
-                  生成于 2025.01.12
+                  生成于 {reportData?.metadata?.generatedAt 
+                    ? new Date(reportData.metadata.generatedAt).toLocaleDateString('zh-CN', { 
+                        year: 'numeric', 
+                        month: '2-digit', 
+                        day: '2-digit' 
+                      })
+                    : new Date().toLocaleDateString('zh-CN', { 
+                        year: 'numeric', 
+                        month: '2-digit', 
+                        day: '2-digit' 
+                      })}
                 </span>
                 <span className="flex items-center gap-2">
                   <FiUsers className="w-4 h-4" />
@@ -107,7 +240,9 @@ export default function SpouseReportPage() {
                 <div className="text-center">
                   <div className="text-4xl mb-3">♊</div>
                   <h3 className="text-xl font-semibold mb-2">上升星座</h3>
-                  <p className="text-lg text-purple-300">Mithuna (双子座)</p>
+                  <p className="text-lg text-purple-300">
+                    {reportData?.keyData?.risingSign || '未知'}
+                  </p>
                   <p className="text-sm text-purple-400">聪慧、善于沟通</p>
                 </div>
               </Card>
@@ -116,7 +251,9 @@ export default function SpouseReportPage() {
                 <div className="text-center">
                   <div className="text-4xl mb-3">🌙</div>
                   <h3 className="text-xl font-semibold mb-2">月亮星座</h3>
-                  <p className="text-lg text-blue-300">Makara (摩羯座)</p>
+                  <p className="text-lg text-blue-300">
+                    {reportData?.keyData?.moonSign || '未知'}
+                  </p>
                   <p className="text-sm text-blue-400">坚韧、务实、负责</p>
                 </div>
               </Card>
@@ -125,7 +262,9 @@ export default function SpouseReportPage() {
                 <div className="text-center">
                   <div className="text-4xl mb-3">☉</div>
                   <h3 className="text-xl font-semibold mb-2">太阳星座</h3>
-                  <p className="text-lg text-red-300">Vrishchika (天蝎座)</p>
+                  <p className="text-lg text-red-300">
+                    {reportData?.keyData?.sunSign || '未知'}
+                  </p>
                   <p className="text-sm text-red-400">深邃、有力、转化</p>
                 </div>
               </Card>
@@ -152,15 +291,20 @@ export default function SpouseReportPage() {
                 </h3>
                 <div className="space-y-4">
                   <p className="text-purple-300 leading-relaxed">
-                    您的第七宫（位于射手座）内无行星落入，这使得宫主星的状态成为分析的绝对核心。
+                    {reportData?.sections?.introduction || 
+                      `您的第七宫（位于${reportData?.keyData?.seventhHouse?.sign || '未知'}）${reportData?.keyData?.seventhHouse?.planets?.length === 0 ? '内无行星落入' : `内有${reportData.keyData.seventhHouse.planets.length}颗行星`}，这使得宫主星的状态成为分析的绝对核心。`}
                   </p>
-                  <div className="bg-purple-900/30 rounded-lg p-4 border border-purple-500/30">
-                    <h4 className="text-lg font-semibold text-pink-300 mb-2">宫主星状态</h4>
-                    <p className="text-purple-200">
-                      您的第七宫主星为 Guru (木星)。木星飞入了代表智慧、恋爱与前世福报的第五宫，
-                      与代表您自身的命主星水星和代表爱情的天然指示星金星形成紧密合相。这是一个顶级的格局。
-                    </p>
-                  </div>
+                  {reportData?.keyData?.seventhHouse && (
+                    <div className="bg-purple-900/30 rounded-lg p-4 border border-purple-500/30">
+                      <h4 className="text-lg font-semibold text-pink-300 mb-2">宫主星状态</h4>
+                      <p className="text-purple-200">
+                        您的第七宫主星为 {reportData.keyData.seventhHouse.lord || '未知'}。
+                        {reportData.keyData.seventhHouse.planets.length > 0 && (
+                          <>第七宫内有行星：{reportData.keyData.seventhHouse.planets.map(p => p.name).join('、')}。</>
+                        )}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </Card>
 
@@ -174,15 +318,17 @@ export default function SpouseReportPage() {
                   <div className="space-y-3">
                     <h4 className="text-lg font-semibold text-yellow-300">金星 (Shukra)</h4>
                     <p className="text-purple-200 text-sm">
-                      您的金星位于天秤座，此为 Swakshetra（入庙），是其力量最强的状态之一。
-                      它落入吉祥的第五宫，并形成了Malavya Yoga（金曜格），这是五大圣人格局之一。
+                      {reportData?.keyData?.venus 
+                        ? `您的金星位于${reportData.keyData.venus.sign}，位于第${reportData.keyData.venus.house}宫。${reportData.keyData.venus.nakshatra ? `星宿：${reportData.keyData.venus.nakshatra}。` : ''}`
+                        : '金星信息未找到'}
                     </p>
                   </div>
                   <div className="space-y-3">
                     <h4 className="text-lg font-semibold text-yellow-300">木星 (Guru)</h4>
                     <p className="text-purple-200 text-sm">
-                      您的木星不仅是七宫主，其状态也极其优越，位于友宫（天秤座），
-                      并与两大吉星（水星、金星）同宫。这揭示了您的伴侣将是智慧、品德高尚且富有魅力之人。
+                      {reportData?.keyData?.jupiter
+                        ? `您的木星位于${reportData.keyData.jupiter.sign}，位于第${reportData.keyData.jupiter.house}宫。${reportData.keyData.seventhHouse?.lord === 'Jupiter' ? '木星是您的第七宫主星。' : ''}`
+                        : '木星信息未找到'}
                     </p>
                   </div>
                 </div>
@@ -211,14 +357,13 @@ export default function SpouseReportPage() {
                   <div>
                     <h4 className="font-semibold text-purple-300 mb-1">外貌特征</h4>
                     <p className="text-purple-200 text-sm">
-                      综合木星与金星的影响，对方很可能外形俊朗/貌美，气质高雅，富有魅力，笑容温暖。
+                      {reportData?.sections?.appearance || '基于您的星盘配置，对方很可能外形俊朗/貌美，气质高雅，富有魅力。'}
                     </p>
                   </div>
                   <div>
                     <h4 className="font-semibold text-purple-300 mb-1">性格特质</h4>
                     <p className="text-purple-200 text-sm">
-                      智慧（木星）、风趣（水星）、富有艺术感和社交手腕（金星）、内在成熟稳重（土星）、
-                      灵魂核心自信且光明磊落（D9太阳）。这是一个集大成者。
+                      {reportData?.sections?.personality || '基于您的星盘配置，对方具有智慧、风趣、富有艺术感等特质。'}
                     </p>
                   </div>
                 </div>
@@ -239,7 +384,7 @@ export default function SpouseReportPage() {
                   <div>
                     <h4 className="font-semibold text-blue-300 mb-1">相遇地点</h4>
                     <p className="text-blue-200 text-sm">
-                      七宫主落第五宫，相遇地点极可能与创意、学习、娱乐、艺术展、音乐会或投资相关的社交圈有关。
+                      {reportData?.sections?.meeting || '基于您的第7宫主星位置，相遇地点可能与相关领域有关。'}
                     </p>
                   </div>
                 </div>
@@ -433,15 +578,23 @@ export default function SpouseReportPage() {
             <Card glow="gold" className="text-center">
               <h2 className="text-3xl font-display mb-6">🙏 结语：总结与祝福</h2>
               <div className="space-y-4 text-purple-300">
-                <p className="text-lg leading-relaxed">
-                  您的命盘描绘了一段非凡的婚姻之旅，它被智慧、爱与前世的福报所深深祝福。
-                  您注定会与一位如太阳般高贵且光芒四射的灵魂伴侣相结合，
-                  共同开启一段相互成就、充满丰盛的生命篇章。
-                </p>
-                <p className="text-base leading-relaxed">
-                  请记住，星盘是您灵魂的地图，它指明了宝藏的所在，
-                  但寻宝的旅程需要您用爱与智慧去亲自走过。
-                </p>
+                {reportData?.sections?.conclusion ? (
+                  <div className="whitespace-pre-line">
+                    <p className="text-lg leading-relaxed">{reportData.sections.conclusion}</p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-lg leading-relaxed">
+                      您的命盘描绘了一段非凡的婚姻之旅，它被智慧、爱与前世的福报所深深祝福。
+                      您注定会与一位如太阳般高贵且光芒四射的灵魂伴侣相结合，
+                      共同开启一段相互成就、充满丰盛的生命篇章。
+                    </p>
+                    <p className="text-base leading-relaxed">
+                      请记住，星盘是您灵魂的地图，它指明了宝藏的所在，
+                      但寻宝的旅程需要您用爱与智慧去亲自走过。
+                    </p>
+                  </>
+                )}
                 <div className="pt-6">
                   <p className="text-2xl font-display text-yellow-400">
                     Blessings to you on your journey. ✨
@@ -500,6 +653,8 @@ export default function SpouseReportPage() {
               ))}
             </div>
           </motion.div>
+            </>
+          )}
         </div>
       </div>
     </div>

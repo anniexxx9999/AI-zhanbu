@@ -5,22 +5,14 @@ const resolveDefaultBaseUrl = () => {
     return stripTrailingSlash(process.env.NEXT_PUBLIC_API_BASE_URL);
   }
 
+  // 在浏览器中，使用相对路径让Next.js rewrite处理
+  // 这样可以避免代理问题和CORS问题
   if (typeof window !== 'undefined') {
-    const current = new URL(window.location.href);
-    const hostname = current.hostname;
-    const port = current.port;
-    const devHostnames = new Set(['localhost', '127.0.0.1']);
-    const devPorts = new Set(['', '3000', '3002', '3003', '4173', '5173', '5174', '5175']);
-
-    if (devHostnames.has(hostname) && devPorts.has(port)) {
-      const backendPort = process.env.NEXT_PUBLIC_DEV_BACKEND_PORT || '3001';
-      return `${current.protocol}//${hostname}:${backendPort}/api`;
-    }
-
-    return `${stripTrailingSlash(current.origin)}/api`;
+    return '/api';
   }
 
-  return 'http://localhost:3001/api';
+  // 服务端渲染时使用完整URL（使用127.0.0.1避免代理问题）
+  return 'http://127.0.0.1:3001/api';
 };
 
 export interface BirthInfo {
@@ -28,6 +20,7 @@ export interface BirthInfo {
   date: string;
   time: string;
   city: string;
+  gender?: string;
   latitude?: number;
   longitude?: number;
   timezone?: string;
@@ -107,6 +100,111 @@ export interface ChartData {
   chartType?: string;
   ayanamsa?: string;
   timestamp: string;
+  analysis?: {
+    lifeEnergy: {
+      strongest: Array<{
+        planet: string;
+        emoji: string;
+        power: string;
+        score: number;
+        desc: string;
+      }>;
+      weakest: {
+        planet: string;
+        emoji: string;
+        lesson: string;
+        score: number;
+        desc: string;
+      };
+    };
+    dashaData?: {
+      timeline: Array<{
+        planet: string;
+        start: number;
+        end: number;
+        color: string;
+        theme: string;
+        isCurrent?: boolean;
+      }>;
+      currentDasha: {
+        major: {
+          planet: string;
+          period: string;
+          theme: string;
+        };
+        minor: {
+          planet: string;
+          period: string;
+          focus: string;
+        };
+        strategy: string;
+      };
+    };
+    coreTrinity: {
+      lagna: {
+        sign: string;
+        emoji: string;
+        mask: string;
+        desc: string;
+      };
+      moon: {
+        sign: string;
+        emoji: string;
+        need: string;
+        desc: string;
+      };
+      sun: {
+        sign: string;
+        emoji: string;
+        fuel: string;
+        desc: string;
+      };
+    };
+    cosmicToolkit: {
+      colors: string[];
+      gem: string;
+      gemPlanet: string;
+      mantra: string;
+      activities: string[];
+      luckyDay: string;
+      element: string;
+    };
+    houseAnalyses?: Array<{
+      house: number;
+      name: string;
+      nameEn: string;
+      sanskrit: string;
+      emoji: string;
+      rating: number;
+      sign: string;
+      lord: string;
+      lordPlacement: string;
+      lordStrength: string;
+      professionalAnalysis?: string;
+      advantages?: string[];
+      challenges?: string[];
+      judgment?: {
+        type: string;
+        icon: string;
+        label: string;
+        reason: string;
+      };
+      keyPeriods?: Array<{
+        name: string;
+        years: string;
+        description: string;
+      }>;
+      actionAdvice?: {
+        leverage: string[];
+        cope: string[];
+      };
+      remedies?: {
+        gemstone: string;
+        day: string;
+        mantra: string;
+      };
+    }>;
+  };
 }
 
 class ApiClient {
@@ -165,9 +263,68 @@ class ApiClient {
   }
 
   async calculateChart(birthInfo: BirthInfo): Promise<ApiResponse<ChartData>> {
-    return this.request('/api/astrology/chart', {
+    return this.request('/astrology/chart', {
       method: 'POST',
       body: JSON.stringify(birthInfo),
+    });
+  }
+
+  async generateAIImage(prompt: string, options?: {
+    width?: number;
+    height?: number;
+    seed?: number;
+    use_pre_llm?: boolean;
+  }): Promise<ApiResponse<{ imageUrl: string; imageUrls: string[]; taskId: string }>> {
+    return this.request('/ai/generate-image', {
+      method: 'POST',
+      body: JSON.stringify({
+        prompt,
+        ...options
+      }),
+    });
+  }
+
+  async generateSpouseReport(chartData: ChartData, birthInfo: BirthInfo): Promise<ApiResponse<{
+    fullContent: string;
+    sections: {
+      introduction: string;
+      personality: string;
+      appearance: string;
+      meeting: string;
+      relationship: string;
+      conclusion: string;
+    };
+    keyData: {
+      risingSign: string;
+      sunSign: string;
+      moonSign: string;
+      seventhHouse: {
+        sign: string;
+        lord: string;
+        planets: Array<{ name: string; sign: string }>;
+      };
+      venus: {
+        sign: string;
+        house: number;
+        nakshatra?: string;
+      } | null;
+      jupiter: {
+        sign: string;
+        house: number;
+      } | null;
+    };
+    birthInfo: BirthInfo;
+    metadata: {
+      wordCount: number;
+      generatedAt: string;
+    };
+  }>> {
+    return this.request('/report/spouse', {
+      method: 'POST',
+      body: JSON.stringify({
+        chartData,
+        birthInfo
+      }),
     });
   }
 }
@@ -176,6 +333,14 @@ export const apiClient = new ApiClient(process.env.NEXT_PUBLIC_API_BASE_URL);
 
 export const astrologyAPI = {
   calculateChart: (birthInfo: BirthInfo) => apiClient.calculateChart(birthInfo),
+  generateAIImage: (prompt: string, options?: {
+    width?: number;
+    height?: number;
+    seed?: number;
+    use_pre_llm?: boolean;
+  }) => apiClient.generateAIImage(prompt, options),
+  generateSpouseReport: (chartData: ChartData, birthInfo: BirthInfo) => 
+    apiClient.generateSpouseReport(chartData, birthInfo),
 };
 
 export default astrologyAPI;

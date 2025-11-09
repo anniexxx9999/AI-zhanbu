@@ -28,8 +28,8 @@ const coreTrinity = {
   sun: { sign: 'Aries', emoji: '☀️', fuel: '驱动你生命前行的燃料是...', desc: '勇气、独立与开拓新事物的冲动' }
 };
 
-// Life Energy Data
-const lifeEnergy = {
+// Life Energy Data (Fallback)
+const fallbackLifeEnergy = {
   strongest: [
     { planet: 'Jupiter', emoji: '✨', power: '智慧与扩张力', score: 95, desc: '你天生拥有强大的学习能力和正向影响力' },
     { planet: 'Venus', emoji: '💕', power: '美感与关系力', score: 88, desc: '你能轻松创造和谐的人际关系与美好环境' },
@@ -239,22 +239,22 @@ const formatNakshatra = (nakshatra?: PlanetPosition['nakshatra'] | null) => {
 
 const retrogradeLabel = (retrograde: boolean) => (retrograde ? '逆行' : '顺行');
 
-// Dasha Timeline Data
-const dashaTimeline = [
+// Dasha Timeline Data (Fallback)
+const fallbackDashaTimeline = [
   { planet: 'Mercury', start: 1995, end: 2012, color: '#10B981', theme: '沟通与学习' },
   { planet: 'Venus', start: 2012, end: 2032, color: '#FF69B4', theme: '爱与创造', isCurrent: true },
   { planet: 'Sun', start: 2032, end: 2038, color: '#F59E0B', theme: '权威与成就' },
   { planet: 'Moon', start: 2038, end: 2048, color: '#8B5CF6', theme: '情感与直觉' },
 ];
 
-const currentDasha = {
+const fallbackCurrentDasha = {
   major: { planet: 'Venus', period: '2012-2032', theme: '这是一个关于爱、创造力与享受的生命季节' },
   minor: { planet: 'Mercury', period: '2023-2025', focus: '焦点转向学习、沟通与商业' },
   strategy: '尽情投入艺术创作、美化生活环境，并积极拓展社交圈。这是播种"美"与"关系"的最佳时机。'
 };
 
-// Cosmic Toolkit
-const cosmicToolkit = {
+// Cosmic Toolkit (Fallback)
+const fallbackCosmicToolkit = {
   colors: ['黄色', '金色', '橙色'],
   gem: '黄宝石',
   gemPlanet: 'Jupiter',
@@ -288,22 +288,45 @@ export default function DashboardPage() {
 
         setBirthInfoState(parsedBirthInfo);
 
+        // 检查缓存数据是否匹配当前生日信息
         const cachedChartData = window.localStorage.getItem('latestChartData');
         let hasCachedChart = false;
+        let cachedBirthInfoMatch = false;
+        
         if (cachedChartData) {
           try {
             const parsedChart: ChartData = JSON.parse(cachedChartData);
-            setChartData(parsedChart);
-            hasCachedChart = true;
+            // 检查缓存的星盘数据是否匹配当前生日信息
+            const cachedBirthInfo = parsedChart.birthInfo;
+            if (cachedBirthInfo && 
+                cachedBirthInfo.date === parsedBirthInfo.date &&
+                cachedBirthInfo.time === parsedBirthInfo.time &&
+                cachedBirthInfo.city === parsedBirthInfo.city) {
+              cachedBirthInfoMatch = true;
+              setChartData(parsedChart);
+              hasCachedChart = true;
+            } else {
+              // 生日信息不匹配，清除旧缓存
+              console.log('Birth info changed, clearing old cache');
+              window.localStorage.removeItem('latestChartData');
+            }
           } catch (cacheErr) {
             console.warn('Failed to parse cached chart data:', cacheErr);
             window.localStorage.removeItem('latestChartData');
           }
         }
 
+        // 总是调用API获取最新数据（如果缓存不匹配或不存在）
         try {
           const response = await astrologyAPI.calculateChart(parsedBirthInfo);
           if (response.success && response.data) {
+            console.log('API response received:', {
+              hasAnalysis: !!response.data.analysis,
+              hasLifeEnergy: !!response.data.analysis?.lifeEnergy,
+              hasDashaData: !!response.data.analysis?.dashaData,
+              hasHouseAnalyses: !!response.data.analysis?.houseAnalyses,
+              hasCosmicToolkit: !!response.data.analysis?.cosmicToolkit,
+            });
             setChartData(response.data);
             window.localStorage.setItem('latestChartData', JSON.stringify(response.data));
           } else if (!hasCachedChart) {
@@ -328,26 +351,71 @@ export default function DashboardPage() {
 
   const effectiveBirthInfo = birthInfoState ?? fallbackBirthInfo;
 
-  const displayCoreTrinity = useMemo(() => ({
-    lagna: {
-      ...coreTrinity.lagna,
-      sign: chartData?.risingSign || coreTrinity.lagna.sign,
-    },
-    moon: {
-      ...coreTrinity.moon,
-      sign: chartData?.moonSign || coreTrinity.moon.sign,
-    },
-    sun: {
-      ...coreTrinity.sun,
-      sign: chartData?.sunSign || coreTrinity.sun.sign,
-    },
-  }), [chartData]);
+  // 使用API分析数据或fallback数据
+  const displayLifeEnergy = useMemo(() => {
+    return chartData?.analysis?.lifeEnergy || fallbackLifeEnergy;
+  }, [chartData]);
+
+  const displayDashaTimeline = useMemo(() => {
+    return chartData?.analysis?.dashaData?.timeline || fallbackDashaTimeline;
+  }, [chartData]);
+
+  const displayCurrentDasha = useMemo(() => {
+    return chartData?.analysis?.dashaData?.currentDasha || fallbackCurrentDasha;
+  }, [chartData]);
+
+  const displayCosmicToolkit = useMemo(() => {
+    return chartData?.analysis?.cosmicToolkit || fallbackCosmicToolkit;
+  }, [chartData]);
+
+  const displayCoreTrinity = useMemo(() => {
+    // 优先使用API分析数据
+    if (chartData?.analysis?.coreTrinity) {
+      return chartData.analysis.coreTrinity;
+    }
+    // 如果API没有返回coreTrinity，但返回了基础星座信息，使用fallback但更新星座名称
+    if (chartData?.risingSign || chartData?.moonSign || chartData?.sunSign) {
+      return {
+        lagna: {
+          ...coreTrinity.lagna,
+          sign: chartData?.risingSign || coreTrinity.lagna.sign,
+        },
+        moon: {
+          ...coreTrinity.moon,
+          sign: chartData?.moonSign || coreTrinity.moon.sign,
+        },
+        sun: {
+          ...coreTrinity.sun,
+          sign: chartData?.sunSign || coreTrinity.sun.sign,
+        },
+      };
+    }
+    // 完全使用fallback数据
+    return coreTrinity;
+  }, [chartData]);
 
   const displayLifeArenas = useMemo(() => {
     if (!chartData) {
       return lifeArenas;
     }
 
+    // 优先使用API分析数据
+    if (chartData.analysis?.houseAnalyses && chartData.analysis.houseAnalyses.length > 0) {
+      return chartData.analysis.houseAnalyses.map((analysis) => {
+        const house = chartData.houses.find(h => h.number === analysis.house);
+        const planetsIn = house?.planets.map(
+          (planet) => `${planet.name}${planet.signSymbol ? ` ${planet.signSymbol}` : ''}`
+        ) || [];
+        
+        return {
+          ...analysis,
+          planetsIn: planetsIn.length > 0 ? planetsIn : [],
+          aspects: [], // API分析中暂不包含相位信息
+        };
+      });
+    }
+
+    // 否则使用基础数据 + 写死的分析
     return chartData.houses.map((house) => {
       const fallback = lifeArenas.find((arena) => arena.house === house.number);
       const planetsIn = house.planets.map(
@@ -692,7 +760,7 @@ export default function DashboardPage() {
                 </div>
                 
                 <div className="space-y-4">
-                  {lifeEnergy.strongest.map((item, idx) => (
+                  {displayLifeEnergy.strongest.map((item, idx) => (
                     <motion.div
                       key={idx}
                       initial={{ opacity: 0, x: -20 }}
@@ -737,22 +805,22 @@ export default function DashboardPage() {
                   transition={{ delay: 0.4 }}
                   className="p-6 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
                 >
-                  <span className="text-5xl mb-4 block">{lifeEnergy.weakest.emoji}</span>
-                  <div className="font-semibold text-xl text-white mb-2">{lifeEnergy.weakest.planet}</div>
-                  <div className="text-sm text-amber-400 mb-3">{lifeEnergy.weakest.lesson}</div>
-                  <p className="text-sm text-gray-300 leading-relaxed mb-4">{lifeEnergy.weakest.desc}</p>
+                  <span className="text-5xl mb-4 block">{displayLifeEnergy.weakest.emoji}</span>
+                  <div className="font-semibold text-xl text-white mb-2">{displayLifeEnergy.weakest.planet}</div>
+                  <div className="text-sm text-amber-400 mb-3">{displayLifeEnergy.weakest.lesson}</div>
+                  <p className="text-sm text-gray-300 leading-relaxed mb-4">{displayLifeEnergy.weakest.desc}</p>
                   
                   {/* Progress bar */}
                   <div className="flex items-center gap-3">
                     <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: `${lifeEnergy.weakest.score}%` }}
+                        animate={{ width: `${displayLifeEnergy.weakest.score}%` }}
                         transition={{ delay: 0.6, duration: 0.8 }}
                         className="h-full bg-gradient-to-r from-amber-400 to-orange-400"
                       />
                     </div>
-                    <div className="text-xs text-amber-300 font-mono">{lifeEnergy.weakest.score}/100</div>
+                    <div className="text-xs text-amber-300 font-mono">{displayLifeEnergy.weakest.score}/100</div>
                   </div>
 
                   <div className="mt-6 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
@@ -1223,7 +1291,7 @@ export default function DashboardPage() {
 
               {/* Timeline bars */}
               <div className="space-y-2 mb-6">
-                {dashaTimeline.map((period, idx) => {
+                {displayDashaTimeline.map((period, idx) => {
                   const totalYears = period.end - period.start;
                   const percentage = (totalYears / (2048 - 1995)) * 100;
                   
@@ -1290,11 +1358,11 @@ export default function DashboardPage() {
                 <div className="flex-1">
                   <div className="text-xs text-pink-300 mb-2 uppercase tracking-wide">Current Season</div>
                   <h3 className="font-serif text-2xl text-white mb-2">
-                    {currentDasha.major.planet} 大运期
+                    {displayCurrentDasha.major.planet} 大运期
                   </h3>
-                  <div className="text-sm text-purple-300 mb-4">{currentDasha.major.period}</div>
+                  <div className="text-sm text-purple-300 mb-4">{displayCurrentDasha.major.period}</div>
                   
-                  <p className="text-white mb-6 leading-relaxed">{currentDasha.major.theme}</p>
+                  <p className="text-white mb-6 leading-relaxed">{displayCurrentDasha.major.theme}</p>
 
                   <div className="p-4 rounded-xl bg-white/5 mb-4">
                     <div className="flex items-center gap-2 mb-2">
@@ -1302,8 +1370,8 @@ export default function DashboardPage() {
                       <div className="text-sm text-purple-300 font-semibold">当前焦点 (次运期)</div>
                     </div>
                     <p className="text-sm text-gray-300">
-                      在 <span className="text-white font-medium">{currentDasha.minor.planet}</span> 的次运期 ({currentDasha.minor.period})，
-                      {currentDasha.minor.focus}。
+                      在 <span className="text-white font-medium">{displayCurrentDasha.minor.planet}</span> 的次运期 ({displayCurrentDasha.minor.period})，
+                      {displayCurrentDasha.minor.focus}。
                     </p>
                   </div>
 
@@ -1313,7 +1381,7 @@ export default function DashboardPage() {
                       <div className="text-sm text-purple-300 font-semibold">本季策略</div>
                     </div>
                     <p className="text-sm text-white leading-relaxed">
-                      {currentDasha.strategy}
+                      {displayCurrentDasha.strategy}
                     </p>
                   </div>
                 </div>
@@ -1351,23 +1419,23 @@ export default function DashboardPage() {
                   <div>
                     <div className="text-xs text-yellow-300 mb-2">💛 Power Colors</div>
                     <div className="flex gap-2">
-                      {cosmicToolkit.colors.map((color, idx) => (
+                      {displayCosmicToolkit.colors.map((color, idx) => (
                         <div key={idx} className="px-3 py-2 rounded-lg bg-white/10 text-sm text-white">
                           {color}
           </div>
         ))}
                     </div>
                     <p className="text-xs text-gray-300 mt-2">
-                      穿戴这些颜色能增强你的 {cosmicToolkit.gemPlanet} 能量
+                      穿戴这些颜色能增强你的 {displayCosmicToolkit.gemPlanet} 能量
                     </p>
                   </div>
 
             <div>
                     <div className="text-xs text-yellow-300 mb-2">💎 推荐宝石</div>
                     <div className="px-4 py-3 rounded-lg bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-400/30">
-                      <div className="font-semibold text-white mb-1">{cosmicToolkit.gem}</div>
+                      <div className="font-semibold text-white mb-1">{displayCosmicToolkit.gem}</div>
                       <p className="text-xs text-gray-300">
-                        与你最强吉星 [{cosmicToolkit.gemPlanet}] 相关，能增强智慧和机遇
+                        与你最强吉星 [{displayCosmicToolkit.gemPlanet}] 相关，能增强智慧和机遇
                       </p>
                     </div>
                   </div>
@@ -1385,7 +1453,7 @@ export default function DashboardPage() {
                   <div>
                     <div className="text-xs text-purple-300 mb-2">🕉️ Personal Mantra</div>
                     <div className="px-4 py-3 rounded-lg bg-white/10">
-                      <div className="font-mono text-white text-center mb-1">{cosmicToolkit.mantra}</div>
+                      <div className="font-mono text-white text-center mb-1">{displayCosmicToolkit.mantra}</div>
                       <p className="text-xs text-gray-300 text-center">
                         持诵此咒语，有助于平复情绪、增强内在力量
                       </p>
@@ -1395,7 +1463,7 @@ export default function DashboardPage() {
                   <div>
                     <div className="text-xs text-purple-300 mb-2">✨ 推荐活动 (充能方式)</div>
                     <ul className="space-y-2">
-                      {cosmicToolkit.activities.map((activity, idx) => (
+                      {displayCosmicToolkit.activities.map((activity, idx) => (
                         <li key={idx} className="flex items-start gap-2 text-sm text-gray-300">
                           <span className="text-purple-400 mt-0.5">•</span>
                           <span>{activity}</span>
@@ -1407,11 +1475,11 @@ export default function DashboardPage() {
                   <div className="flex gap-3">
                     <div className="flex-1 p-3 rounded-lg bg-white/5 text-center">
                       <div className="text-xs text-purple-300 mb-1">幸运日</div>
-                      <div className="text-sm text-white font-semibold">{cosmicToolkit.luckyDay}</div>
+                      <div className="text-sm text-white font-semibold">{displayCosmicToolkit.luckyDay}</div>
                     </div>
                     <div className="flex-1 p-3 rounded-lg bg-white/5 text-center">
                       <div className="text-xs text-purple-300 mb-1">主元素</div>
-                      <div className="text-sm text-white font-semibold">{cosmicToolkit.element}</div>
+                      <div className="text-sm text-white font-semibold">{displayCosmicToolkit.element}</div>
               </div>
             </div>
           </div>

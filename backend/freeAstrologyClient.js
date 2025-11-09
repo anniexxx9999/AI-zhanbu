@@ -10,6 +10,36 @@ class FreeAstrologyClient {
     }
   }
 
+  // 转换timezone字符串为数字偏移量
+  convertTimezoneToOffset(timezone) {
+    // 常见时区的偏移量映射
+    const timezoneMap = {
+      'Asia/Shanghai': 8.0,
+      'Asia/Kolkata': 5.5,
+      'Asia/Dubai': 4.0,
+      'Asia/Tokyo': 9.0,
+      'America/New_York': -5.0,
+      'America/Los_Angeles': -8.0,
+      'Europe/London': 0.0,
+      'Europe/Paris': 1.0,
+      'Australia/Sydney': 10.0
+    };
+
+    if (timezoneMap[timezone]) {
+      return timezoneMap[timezone];
+    }
+
+    // 如果timezone已经是数字字符串，直接转换
+    const numTimezone = parseFloat(timezone);
+    if (!isNaN(numTimezone)) {
+      return numTimezone;
+    }
+
+    // 默认返回UTC+8（北京时间）
+    console.warn(`Unknown timezone: ${timezone}, using default 8.0`);
+    return 8.0;
+  }
+
   // 转换出生信息为API格式
   convertBirthInfo(birthInfo) {
     const { name, date, time, city, latitude, longitude, timezone } = birthInfo;
@@ -36,18 +66,33 @@ class FreeAstrologyClient {
         };
       }
 
-      const response = await axios.post(`${this.baseURL}/planets/extended`, {
-        year: parseInt(birthData.date.split('-')[0]),
-        month: parseInt(birthData.date.split('-')[1]),
-        day: parseInt(birthData.date.split('-')[2]),
-        hour: parseInt(birthData.time.split(':')[0]),
-        minute: parseInt(birthData.time.split(':')[1]),
-        latitude: birthData.latitude,
-        longitude: birthData.longitude,
-        timezone: birthData.timezone
-      }, {
+      // 解析日期和时间
+      const dateParts = birthData.date.split('-');
+      const timeParts = birthData.time.split(':');
+      
+      // 转换timezone字符串为数字（例如 "Asia/Kolkata" -> 5.5）
+      const timezoneOffset = this.convertTimezoneToOffset(birthData.timezone);
+
+      const requestPayload = {
+        year: parseInt(dateParts[0]),
+        month: parseInt(dateParts[1]),
+        date: parseInt(dateParts[2]),
+        hours: parseInt(timeParts[0]) || 0,
+        minutes: parseInt(timeParts[1]) || 0,
+        seconds: parseInt(timeParts[2]) || 0,
+        latitude: birthData.latitude || 39.9042,
+        longitude: birthData.longitude || 116.4074,
+        timezone: timezoneOffset,
+        settings: {
+          observation_point: 'topocentric',
+          ayanamsha: 'lahiri',
+          language: 'en'
+        }
+      };
+
+      const response = await axios.post(`${this.baseURL}/planets/extended`, requestPayload, {
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          'x-api-key': this.apiKey,
           'Content-Type': 'application/json'
         }
       });
@@ -77,28 +122,53 @@ class FreeAstrologyClient {
         };
       }
 
-      const response = await axios.post(`${this.baseURL}/navamsa-chart-info`, {
-        year: parseInt(birthData.date.split('-')[0]),
-        month: parseInt(birthData.date.split('-')[1]),
-        day: parseInt(birthData.date.split('-')[2]),
-        hour: parseInt(birthData.time.split(':')[0]),
-        minute: parseInt(birthData.time.split(':')[1]),
-        latitude: birthData.latitude,
-        longitude: birthData.longitude,
-        timezone: birthData.timezone
-      }, {
+      // 解析日期和时间
+      const dateParts = birthData.date.split('-');
+      const timeParts = birthData.time.split(':');
+      const timezoneOffset = this.convertTimezoneToOffset(birthData.timezone);
+
+      const requestPayload = {
+        year: parseInt(dateParts[0]),
+        month: parseInt(dateParts[1]),
+        date: parseInt(dateParts[2]),
+        hours: parseInt(timeParts[0]) || 0,
+        minutes: parseInt(timeParts[1]) || 0,
+        seconds: parseInt(timeParts[2]) || 0,
+        latitude: birthData.latitude || 39.9042,
+        longitude: birthData.longitude || 116.4074,
+        timezone: timezoneOffset,
+        settings: {
+          observation_point: 'topocentric',
+          ayanamsha: 'lahiri',
+          language: 'en'
+        }
+      };
+
+      const response = await axios.post(`${this.baseURL}/navamsa-chart-info`, requestPayload, {
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          'x-api-key': this.apiKey,
           'Content-Type': 'application/json'
         }
       });
 
+      // API返回的数据结构是 { statusCode: 200, output: {...} }
+      if (response.data && response.data.output) {
+        return {
+          success: true,
+          data: response.data.output
+        };
+      }
+      
       return {
         success: true,
         data: response.data
       };
     } catch (error) {
       console.error('Free Astrology API Navamsa error:', error.message);
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', JSON.stringify(error.response.data).substring(0, 200));
+      }
       return {
         success: false,
         error: error.message,

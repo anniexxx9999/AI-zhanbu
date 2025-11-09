@@ -55,3 +55,6 @@ export default function Confetti({ active, duration = 3000 }: ConfettiProps) {
 
 
 
+
+
+

@@ -7,7 +7,7 @@ import StarField from '@/components/particles/StarField';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
-import { FiUser, FiCalendar, FiClock, FiMapPin } from 'react-icons/fi';
+import { FiUser, FiCalendar, FiClock, FiMapPin, FiUsers } from 'react-icons/fi';
 import { astrologyAPI } from '@/services/api';
 
 export default function BirthInfoPage() {
@@ -17,6 +17,7 @@ export default function BirthInfoPage() {
     date: '1990-05-20',
     time: '08:30',
     city: 'New Delhi, India',
+    gender: 'female',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isDefaultData, setIsDefaultData] = useState(true);
@@ -29,6 +30,7 @@ export default function BirthInfoPage() {
       date: '',
       time: '',
       city: '',
+      gender: '',
     });
     setIsDefaultData(false);
     setErrors({});
@@ -198,6 +200,53 @@ export default function BirthInfoPage() {
                 }}
                 error={errors.city}
               />
+
+              {/* Gender Selection */}
+              <div className="relative">
+                <motion.label
+                  className="block mb-2 font-medium text-text-secondary text-base"
+                >
+                  性别
+                </motion.label>
+                <div className="flex items-center gap-4">
+                  <div className="relative flex-1">
+                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-muted text-xl">
+                      <FiUsers />
+                    </div>
+                    <select
+                      value={formData.gender}
+                      onChange={(e) => {
+                        setFormData({ ...formData, gender: e.target.value });
+                        if (isDefaultData) setIsDefaultData(false);
+                      }}
+                      className={`
+                        input-field pl-12 pr-4
+                        ${errors.gender ? 'border-coral-pink' : ''}
+                        focus:scale-[1.02] transition-transform duration-200
+                        appearance-none cursor-pointer
+                      `}
+                    >
+                      <option value="">请选择性别</option>
+                      <option value="female">女</option>
+                      <option value="male">男</option>
+                    </select>
+                    <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-text-muted pointer-events-none">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                {errors.gender && (
+                  <motion.p
+                    className="mt-2 text-sm text-coral-pink"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    {errors.gender}
+                  </motion.p>
+                )}
+              </div>
 
               {/* Privacy Notice */}
               <motion.div

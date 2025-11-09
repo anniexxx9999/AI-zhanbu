@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { FiRefreshCw, FiDownload, FiShare2, FiHeart, FiStar, FiEye, FiZap } from 'react-icons/fi';
 import { generateSoulmatePrompt, generateMultiplePrompts, getAstrologicalInsights, AstrologicalData } from '@/utils/aiPromptGenerator';
+import { astrologyAPI } from '@/services/api';
 
 interface SoulmatePortraitProps {
   birthInfo?: any;
@@ -16,46 +17,132 @@ export default function SoulmatePortrait({ birthInfo, astrologicalData }: Soulma
   const [currentImage, setCurrentImage] = useState<string | null>(null);
   const [generationPrompt, setGenerationPrompt] = useState<string>('');
   const [isLiked, setIsLiked] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // 从localStorage获取占星数据
+  const getChartData = useCallback(() => {
+    try {
+      const stored = localStorage.getItem('latestChartData');
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {
+      console.warn('Failed to parse chart data from localStorage:', e);
+    }
+    return null;
+  }, []);
 
   // 基于占星数据生成AI提示词
   const generatePrompt = useCallback(() => {
+    const chartData = getChartData();
+    
+    // 提取第7宫数据
+    const seventhHouse = astrologicalData?.seventhHouse || chartData?.houses?.find((h: any) => h.number === 7);
+    
+    // 提取第7宫内的行星（从planets数组中找出house为7的行星）
+    let seventhHousePlanets: Array<{name: string; sign: string}> = [];
+    if (chartData?.planets && Array.isArray(chartData.planets)) {
+      seventhHousePlanets = chartData.planets
+        .filter((p: any) => p.house === 7)
+        .map((p: any) => ({
+          name: p.name,
+          sign: p.sign || p.zodiacSignName || 'Unknown'
+        }));
+    }
+    
+    // 构建完整的第7宫数据
+    const completeSeventhHouse = seventhHouse ? {
+      ...seventhHouse,
+      planets: seventhHousePlanets.length > 0 
+        ? seventhHousePlanets 
+        : seventhHouse.planets || []
+    } : undefined;
+    
+    // 提取金星的Nakshatra（星宿）
+    const venusPlanet = chartData?.planets?.find((p: any) => p.name === 'Venus');
+    const venusNakshatra = venusPlanet?.nakshatra?.name || venusPlanet?.nakshatra;
+    
     const astroData: AstrologicalData = {
-      sunSign: astrologicalData?.sunSign || 'Leo',
-      moonSign: astrologicalData?.moonSign || 'Pisces',
-      venusSign: astrologicalData?.venusSign || 'Libra',
-      marsSign: astrologicalData?.marsSign || 'Aries',
-      risingSign: astrologicalData?.risingSign || 'Scorpio',
-      seventhHouse: astrologicalData?.seventhHouse,
+      sunSign: astrologicalData?.sunSign || chartData?.sunSign || 'Leo',
+      moonSign: astrologicalData?.moonSign || chartData?.moonSign || 'Pisces',
+      venusSign: astrologicalData?.venusSign || venusPlanet?.sign || 'Libra',
+      venusNakshatra: astrologicalData?.venusNakshatra || venusNakshatra,
+      marsSign: astrologicalData?.marsSign || chartData?.planets?.find((p: any) => p.name === 'Mars')?.sign || 'Aries',
+      risingSign: astrologicalData?.risingSign || chartData?.risingSign || 'Scorpio',
+      seventhHouse: completeSeventhHouse,
       navamsa: astrologicalData?.navamsa
     };
 
+    // 从 birthInfo 获取用户性别
+    const userGender = birthInfo?.gender as 'male' | 'female' | undefined;
+
     return generateSoulmatePrompt(astroData, {
-      style: 'mystical',
+      style: 'realistic', // 改为写实风格
       quality: 'high',
       mood: 'mysterious'
-    });
-  }, [astrologicalData]);
+    }, userGender);
+  }, [astrologicalData, birthInfo, getChartData]);
 
-  // 模拟AI图片生成
+  // 调用即梦AI生成图片
   const generateImage = useCallback(async () => {
     setIsGenerating(true);
-    const prompt = generatePrompt();
-    setGenerationPrompt(prompt);
+    setError(null);
     
-    // 模拟生成时间
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    // 使用占位图片，实际项目中会调用AI API
-    const placeholderImages = [
-      'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=600&fit=crop&crop=face',
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop&crop=face',
-      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=600&fit=crop&crop=face',
-      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=600&fit=crop&crop=face'
-    ];
-    
-    const randomImage = placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
-    setCurrentImage(randomImage);
-    setIsGenerating(false);
+    try {
+      const prompt = generatePrompt();
+      setGenerationPrompt(prompt);
+      
+      console.log('🔄 开始生成图片，prompt:', prompt.substring(0, 100));
+      
+      // 调用即梦AI API
+      const response = await astrologyAPI.generateAIImage(prompt, {
+        width: 1024,
+        height: 1024,
+        use_pre_llm: true,
+        seed: -1
+      });
+
+      console.log('📥 API响应:', response);
+
+      // 后端返回的是扁平结构：{success: true, imageUrl: "...", imageUrls: [...]}
+      // 而不是嵌套结构：{success: true, data: {imageUrl: "..."}}
+      const imageUrl = response.data?.imageUrl || response.imageUrl;
+      const imageUrls = response.data?.imageUrls || response.imageUrls;
+
+      if (response.success && imageUrl) {
+        console.log('✅ 图片生成成功，URL:', imageUrl);
+        setCurrentImage(imageUrl);
+      } else {
+        console.error('❌ API返回失败:', {
+          success: response.success,
+          error: response.error,
+          message: response.message,
+          imageUrl: imageUrl,
+          response: response
+        });
+        throw new Error(response.error || response.message || 'Failed to generate image');
+      }
+    } catch (err: any) {
+      console.error('❌ AI image generation error:', err);
+      console.error('错误详情:', {
+        message: err.message,
+        stack: err.stack,
+        response: err.response
+      });
+      setError(err.message || '生成图片失败，请稍后重试');
+      
+      // 失败时使用占位图片
+      const placeholderImages = [
+        'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=600&fit=crop&crop=face',
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop&crop=face',
+        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=600&fit=crop&crop=face',
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=600&fit=crop&crop=face'
+      ];
+      const randomImage = placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
+      setCurrentImage(randomImage);
+    } finally {
+      setIsGenerating(false);
+    }
   }, [generatePrompt]);
 
   useEffect(() => {
@@ -102,16 +189,33 @@ export default function SoulmatePortrait({ birthInfo, astrologicalData }: Soulma
         {/* 图片容器 */}
         <div className="relative bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
           {isGenerating ? (
-            <div className="aspect-[3/4] flex items-center justify-center">
+            <div className="aspect-[3/4] flex flex-col items-center justify-center">
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                 className="w-16 h-16 border-4 border-purple-400 border-t-transparent rounded-full"
               />
-              <div className="ml-4">
-                <p className="text-white font-semibold">AI正在生成你的灵魂伴侣画像...</p>
-                <p className="text-purple-300 text-sm">基于你的星盘特征</p>
+              <div className="mt-4 text-center">
+                <p className="text-white font-semibold">即梦AI正在生成你的灵魂伴侣画像...</p>
+                <p className="text-purple-300 text-sm mt-1">基于你的星盘特征</p>
+                {generationPrompt && (
+                  <p className="text-purple-400 text-xs mt-2 max-w-xs truncate">
+                    {generationPrompt.substring(0, 50)}...
+                  </p>
+                )}
               </div>
+            </div>
+          ) : error ? (
+            <div className="aspect-[3/4] flex flex-col items-center justify-center">
+              <FiEye className="w-16 h-16 text-red-400 mx-auto mb-4" />
+              <p className="text-red-300 font-semibold mb-2">生成失败</p>
+              <p className="text-purple-300 text-sm text-center px-4">{error}</p>
+              <button
+                onClick={generateImage}
+                className="mt-4 px-4 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 transition-colors text-white text-sm"
+              >
+                重新生成
+              </button>
             </div>
           ) : currentImage ? (
             <div className="relative">
@@ -156,11 +260,20 @@ export default function SoulmatePortrait({ birthInfo, astrologicalData }: Soulma
                 <div className="bg-black/50 backdrop-blur-sm rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
                     <FiStar className="text-yellow-400 w-4 h-4" />
-                    <span className="text-white font-semibold text-sm">AI生成画像</span>
+                    <span className="text-white font-semibold text-sm">即梦AI生成画像</span>
                   </div>
                   <p className="text-purple-200 text-xs">
                     基于你的星盘特征个性化生成
                   </p>
+                  {generationPrompt && (
+                    <button
+                      onClick={generateImage}
+                      className="mt-2 w-full px-3 py-1.5 rounded bg-purple-600/50 hover:bg-purple-600/70 transition-colors text-white text-xs flex items-center justify-center gap-2"
+                    >
+                      <FiRefreshCw className="w-3 h-3" />
+                      重新生成
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

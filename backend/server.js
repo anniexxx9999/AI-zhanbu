@@ -4,6 +4,11 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const FreeAstrologyClient = require('./freeAstrologyClient');
+const { generateAstrologyAnalysis } = require('./services/astrologyAnalysisService');
+const JimengAIService = require('./services/jimengAIService');
+const AITextService = require('./services/aiTextService');
+const { buildSpouseReportPrompt, formatReportContent } = require('./services/spouseReportService');
+const { generateCacheKey, getCache, setCache } = require('./services/reportCache');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -15,6 +20,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // 初始化Free Astrology API客户端
 const freeAstrologyClient = new FreeAstrologyClient();
+
+// 初始化即梦AI服务
+const jimengAIService = new JimengAIService();
+
+// 初始化AI文本生成服务
+const aiTextService = new AITextService();
 
 const SIGN_NAMES = [
   'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
@@ -78,30 +89,36 @@ function processAstrologyData(chartData, navamsaData, birthInfo) {
             ? Math.round(planet.seconds)
             : Math.round((((planet.normDegree || 0) - degree) * 60 - minute) * 60);
 
+          // 处理retrograde字段（API返回的是isRetro字符串 "true"/"false"）
+          const isRetrograde = planet.isRetro === 'true' || planet.isRetro === true || planet.is_retrograde === true;
+
+          // 处理Nakshatra数据（API返回的是扁平结构）
+          const nakshatra = (planet.nakshatra_number || planet.nakshatra) ? {
+            number: planet.nakshatra_number || planet.nakshatra?.number || 0,
+            name: planet.nakshatra_name || planet.nakshatra?.name || 'Unknown',
+            pada: planet.nakshatra_pada || planet.nakshatra?.pada || 1,
+            vimsottariLord: planet.nakshatra_vimsottari_lord || planet.nakshatra?.vimsottari_lord || 'Unknown'
+          } : null;
+
           return {
             name: key,
             symbol: PLANET_SYMBOLS[key] || '?',
-            longitude: planet.longitude || 0,
-            fullDegree: planet.longitude || 0,
+            longitude: planet.fullDegree || planet.longitude || 0,
+            fullDegree: planet.fullDegree || planet.longitude || 0,
             normDegree: planet.normDegree || 0,
             latitude: planet.latitude || 0,
-            house: planet.current_house || 1,
-            sign: SIGN_NAMES[signIndex] || 'Unknown',
+            house: planet.house_number || planet.current_house || 1,
+            sign: planet.zodiac_sign_name || SIGN_NAMES[signIndex] || 'Unknown',
             signSymbol: SIGN_SYMBOLS[signIndex] || '?',
-            zodiacSignName: SIGN_NAMES[signIndex] || 'Unknown',
-            zodiacSignLord: SIGN_LORDS[signIndex] || 'Unknown',
+            zodiacSignName: planet.zodiac_sign_name || SIGN_NAMES[signIndex] || 'Unknown',
+            zodiacSignLord: planet.zodiac_sign_lord || SIGN_LORDS[signIndex] || 'Unknown',
             degree: degree,
             minute: minute,
             second: second,
-            retrograde: planet.is_retrograde || false,
+            retrograde: isRetrograde,
             speed: planet.speed || 0,
-            localizedName: getLocalizedName(key),
-            nakshatra: planet.nakshatra ? {
-              number: planet.nakshatra.number || 0,
-              name: planet.nakshatra.name || 'Unknown',
-              pada: planet.nakshatra.pada || 1,
-              vimsottariLord: planet.nakshatra.vimsottari_lord || 'Unknown'
-            } : null,
+            localizedName: planet.localized_name || getLocalizedName(key),
+            nakshatra: nakshatra,
             raw: planet
           };
         })
@@ -169,23 +186,31 @@ function processAstrologyData(chartData, navamsaData, birthInfo) {
     }));
   };
 
+  const planets = processPlanets(chartData);
+  const houses = processHouses(chartData.houses || []);
+  
+  // 从planets中提取星座信息
+  const sunPlanet = planets.find(p => p.name === 'Sun');
+  const moonPlanet = planets.find(p => p.name === 'Moon');
+  const ascPlanet = planets.find(p => p.name === 'Ascendant');
+  
   return {
     birthInfo: birthInfo,
-    planets: processPlanets(chartData),
-    houses: processHouses(chartData.houses || []),
+    planets: planets,
+    houses: houses,
     aspects: [],
     lagna: 1,
     lagnaDetails: {
-      longitude: 0,
-      sign: 'Unknown',
-      signSymbol: '?',
-      degree: 0,
-      minute: 0,
-      second: 0
+      longitude: ascPlanet?.longitude || 0,
+      sign: ascPlanet?.sign || 'Unknown',
+      signSymbol: ascPlanet?.signSymbol || '?',
+      degree: ascPlanet?.degree || 0,
+      minute: ascPlanet?.minute || 0,
+      second: ascPlanet?.second || 0
     },
-    moonSign: 'Unknown',
-    sunSign: 'Unknown',
-    risingSign: 'Unknown',
+    moonSign: moonPlanet?.sign || 'Unknown',
+    sunSign: sunPlanet?.sign || 'Unknown',
+    risingSign: ascPlanet?.sign || 'Unknown',
     chartType: 'North Indian',
     ayanamsa: 'Lahiri',
     timestamp: new Date().toISOString()
@@ -545,15 +570,15 @@ app.get('/api/health', (req, res) => {
 // 占星图表计算端点
 app.post('/api/astrology/chart', async (req, res) => {
   try {
-    const { name, date, time, city, latitude, longitude, timezone } = req.body;
-
-    if (!name || !date || !time || !city) {
-      return res.status(400).json({
-        success: false,
-        error: 'bad_request',
-        message: 'Missing required fields: name, date, time, city'
-      });
-    }
+  const { name, date, time, city, latitude, longitude, timezone } = req.body;
+  
+  if (!name || !date || !time || !city) {
+    return res.status(400).json({
+      success: false,
+      error: 'bad_request',
+      message: 'Missing required fields: name, date, time, city'
+    });
+  }
 
     const birthData = freeAstrologyClient.convertBirthInfo({
       name,
@@ -566,28 +591,78 @@ app.post('/api/astrology/chart', async (req, res) => {
     });
 
     const chartResult = await freeAstrologyClient.getBasicChartInfo(birthData);
-
+    
+    let processedData;
+    let dataSource = 'free-astrology-api';
+    
     if (!chartResult.success) {
-      return res.json(getMockChartData(name, date, time, city, latitude, longitude, timezone));
+      // 使用mock数据
+      const mockResponse = getMockChartData(name, date, time, city, latitude, longitude, timezone);
+      processedData = mockResponse.data;
+      dataSource = 'mock-data';
+    } else {
+      const navamsaResult = await freeAstrologyClient.getNavamsaChartInfo(birthData);
+      
+      // API返回的数据结构是 { statusCode: 200, output: {...} }
+      // 需要提取output部分
+      const chartOutput = chartResult.data.output || chartResult.data;
+      const navamsaOutput = navamsaResult.data?.output || navamsaResult.data || {};
+      
+      // 从planets数据中提取houses信息（基于上升点计算）
+      const ascPlanet = chartOutput.Ascendant || chartOutput.ascendant;
+      const ascSign = ascPlanet ? (ascPlanet.current_sign || 1) : 1;
+      
+      // 生成12个宫位（基于上升星座）
+      const houses = Array.from({ length: 12 }, (_, i) => {
+        const houseSign = ((ascSign - 1 + i) % 12) + 1;
+        return {
+          house_number: i + 1,
+          sign: houseSign
+        };
+      });
+      
+      processedData = processAstrologyData(
+        { ...chartOutput, houses: houses },
+        navamsaOutput,
+        {
+          name,
+          date,
+          time,
+          city,
+          latitude: latitude || 39.9042,
+          longitude: longitude || 116.4074,
+          timezone: timezone || 'Asia/Shanghai'
+        }
+      );
     }
 
-    const navamsaResult = await freeAstrologyClient.getNavamsaChartInfo(birthData);
-
-    const processedData = processAstrologyData(chartResult.data, navamsaResult.data, {
-      name,
-      date,
-      time,
-      city,
-      latitude: latitude || 39.9042,
-      longitude: longitude || 116.4074,
-      timezone: timezone || 'Asia/Shanghai'
-    });
+    // 生成高级分析数据（无论是真实数据还是mock数据）
+    let analysisData = null;
+    try {
+      analysisData = generateAstrologyAnalysis(processedData, {
+        name,
+        date,
+        time,
+        city,
+        latitude: latitude || 39.9042,
+        longitude: longitude || 116.4074,
+        timezone: timezone || 'Asia/Shanghai'
+      });
+      console.log('✅ Analysis data generated successfully');
+    } catch (analysisError) {
+      console.error('❌ Failed to generate analysis data:', analysisError.message);
+      console.error('Error stack:', analysisError.stack);
+      // 继续返回基础数据，即使分析失败
+    }
 
     res.json({
       success: true,
-      data: processedData,
+      data: {
+        ...processedData,
+        analysis: analysisData // 添加分析数据
+      },
       timestamp: new Date().toISOString(),
-      source: 'free-astrology-api'
+      source: dataSource
     });
 
   } catch (error) {
@@ -607,10 +682,256 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       health: '/api/health',
-      chart: '/api/astrology/chart'
+      chart: '/api/astrology/chart',
+      aiImage: '/api/ai/generate-image'
     }
   });
 });
+
+// 即梦AI文生图端点（火山方舟Ark API）
+app.post('/api/ai/generate-image', async (req, res) => {
+  try {
+    const { prompt, width = 1024, height = 1024, size = null, watermark = true } = req.body;
+    
+    if (!prompt) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required field: prompt'
+      });
+    }
+
+    // 使用新的同步API
+    const result = await jimengAIService.generateImage(prompt, {
+      width,
+      height,
+      size,
+      response_format: 'url',
+      watermark
+    });
+
+    if (!result.success) {
+      return res.status(500).json({
+        success: false,
+        error: result.error || 'Failed to generate image',
+        details: result.details
+      });
+    }
+
+    if (result.imageUrl) {
+      return res.json({
+        success: true,
+        imageUrl: result.imageUrl,
+        imageUrls: result.imageUrls || [result.imageUrl],
+        taskId: result.taskId || 'immediate'
+      });
+    } else {
+      return res.status(500).json({
+        success: false,
+        error: 'No image URL returned'
+      });
+    }
+  } catch (error) {
+    console.error('AI image generation error:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message || 'Internal server error'
+    });
+  }
+});
+
+// 配偶报告生成端点
+app.post('/api/report/spouse', async (req, res) => {
+  try {
+    const { chartData, birthInfo } = req.body;
+
+    // 验证输入
+    if (!chartData) {
+      return res.status(400).json({
+        success: false,
+        error: 'chartData is required'
+      });
+    }
+
+    if (!birthInfo) {
+      return res.status(400).json({
+        success: false,
+        error: 'birthInfo is required'
+      });
+    }
+
+    console.log('📝 开始生成配偶报告:', {
+      name: birthInfo?.name || '未知',
+      date: birthInfo?.date || '未知',
+      hasChartData: !!chartData,
+      hasPlanets: !!chartData?.planets,
+      hasHouses: !!chartData?.houses
+    });
+
+    // 检查缓存（安全处理）
+    let cacheKey = null;
+    let cachedReport = null;
+    try {
+      cacheKey = generateCacheKey(chartData, birthInfo);
+      if (cacheKey && !cacheKey.startsWith('error_')) {
+        cachedReport = getCache(cacheKey);
+      }
+    } catch (cacheError) {
+      console.warn('⚠️ 缓存检查失败，继续生成新报告:', cacheError.message);
+    }
+    
+    if (cachedReport) {
+      console.log('✅ 使用缓存报告');
+      return res.json({
+        success: true,
+        data: cachedReport,
+        source: 'cache',
+        metadata: {
+          generatedAt: new Date().toISOString(),
+          cached: true
+        }
+      });
+    }
+
+    // 构建AI提示词（优化后的简洁版本）
+    let prompt;
+    try {
+      prompt = buildSpouseReportPrompt(chartData, birthInfo);
+    } catch (promptError) {
+      console.error('❌ 构建prompt失败:', promptError);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to build prompt: ' + promptError.message
+      });
+    }
+
+    // 系统提示词（简化）
+    const systemPrompt = `你是印度占星大师，用温暖、诗意、赋能的语言解读命盘。专业而温暖，避免宿命论。`;
+
+    const startTime = Date.now();
+    
+    // 调用AI生成报告（优化：减少token数，提高速度）
+    const aiResult = await aiTextService.generateText(prompt, {
+      systemPrompt: systemPrompt,
+      temperature: 0.7,
+      maxTokens: 2000  // 从3000减少到2000，加快生成速度
+    });
+    
+    const generationTime = Date.now() - startTime;
+    console.log(`⏱️ 报告生成耗时: ${generationTime}ms`);
+
+    if (!aiResult.success) {
+      console.error('❌ AI生成报告失败:', aiResult.error);
+      
+      // 如果AI失败，返回基于模板的报告（使用实际数据）
+      return res.json({
+        success: true,
+        data: generateFallbackReport(chartData, birthInfo),
+        source: 'template',
+        error: aiResult.error
+      });
+    }
+
+    // 格式化报告内容
+    const formattedReport = formatReportContent(aiResult.content);
+
+    // 提取关键数据用于前端展示
+    const keyData = extractKeyData(chartData, birthInfo);
+
+    const reportData = {
+      ...formattedReport,
+      keyData: keyData,
+      birthInfo: birthInfo
+    };
+
+    // 保存到缓存（安全处理）
+    try {
+      if (cacheKey && !cacheKey.startsWith('error_')) {
+        setCache(cacheKey, reportData);
+      }
+    } catch (cacheError) {
+      console.warn('⚠️ 保存缓存失败:', cacheError.message);
+    }
+
+    console.log('✅ 报告生成成功');
+
+    res.json({
+      success: true,
+      data: reportData,
+      source: 'ai',
+      metadata: {
+        generatedAt: new Date().toISOString(),
+        provider: aiTextService.provider,
+        generationTime: generationTime
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ 报告生成错误:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Internal server error'
+    });
+  }
+});
+
+/**
+ * 提取关键数据用于前端展示
+ */
+function extractKeyData(chartData, birthInfo) {
+  const seventhHouse = chartData.houses?.find(h => h.number === 7);
+  const venusPlanet = chartData.planets?.find(p => p.name === 'Venus');
+  const jupiterPlanet = chartData.planets?.find(p => p.name === 'Jupiter');
+  const sunPlanet = chartData.planets?.find(p => p.name === 'Sun');
+  const moonPlanet = chartData.planets?.find(p => p.name === 'Moon');
+  const ascPlanet = chartData.planets?.find(p => p.name === 'Ascendant');
+  
+  return {
+    risingSign: ascPlanet?.sign || chartData.risingSign,
+    sunSign: sunPlanet?.sign || chartData.sunSign,
+    moonSign: moonPlanet?.sign || chartData.moonSign,
+    seventhHouse: {
+      sign: seventhHouse?.sign,
+      lord: seventhHouse?.lord,
+      planets: chartData.planets?.filter(p => p.house === 7).map(p => ({
+        name: p.name,
+        sign: p.sign
+      })) || []
+    },
+    venus: venusPlanet ? {
+      sign: venusPlanet.sign,
+      house: venusPlanet.house,
+      nakshatra: venusPlanet.nakshatra?.name || venusPlanet.nakshatra
+    } : null,
+    jupiter: jupiterPlanet ? {
+      sign: jupiterPlanet.sign,
+      house: jupiterPlanet.house
+    } : null
+  };
+}
+
+/**
+ * 生成fallback报告（当AI失败时使用）
+ */
+function generateFallbackReport(chartData, birthInfo) {
+  const keyData = extractKeyData(chartData, birthInfo);
+  
+  return {
+    fullContent: `基于您的星盘数据生成的配偶分析报告。\n\n您的第7宫位于${keyData.seventhHouse?.sign || '未知'}，这预示着您的配偶特质...`,
+    sections: {
+      introduction: '欢迎您，亲爱的求知者...',
+      personality: '基于您的第7宫配置...',
+      appearance: '根据金星和星宿的影响...',
+      meeting: '第7宫主星的位置暗示...',
+      relationship: '您的关系模式...',
+      conclusion: '愿您找到理想的伴侣...'
+    },
+    keyData: keyData,
+    metadata: {
+      wordCount: 0,
+      generatedAt: new Date().toISOString()
+    }
+  };
+}
 
 // 启动服务器
 app.listen(PORT, () => {
